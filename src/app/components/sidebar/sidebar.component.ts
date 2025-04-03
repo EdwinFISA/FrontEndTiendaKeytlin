@@ -12,7 +12,8 @@ export class SidebarComponent {
     productos: false,
     inventario: false,
     ventas: false,
-    administracion: false
+    administracion: false,
+    reportes: false
   };
 
   toggleDropdown(menu: string): void {

@@ -18,8 +18,8 @@
         </svg>
       </li>
       <ul *ngIf="isDropdownOpen.caja" class="pl-8">
-        <li class="py-2 cursor-pointer"><a routerLink="/home/caja">Abrir caja</a></li>
-        <li class="py-2 cursor-pointer"><a routerLink="/home/caja">Cerrar caja</a></li>
+        <li class="py-2 cursor-pointer"><a routerLink="/home/caja/apertura-caja">Apertura de caja</a></li>
+        <li class="py-2 cursor-pointer"><a routerLink="/home/caja/cierre-caja">Cierre de caja</a></li>
       </ul>
 
       <!-- Menú desplegable Articulos -->
@@ -30,8 +30,8 @@
         </svg>
       </li>
       <ul *ngIf="isDropdownOpen.productos" class="pl-8">
-        <li class="py-2 cursor-pointer"><a routerLink="/home/productos">Productos</a></li>
-        <li class="py-2 cursor-pointer"><a routerLink="/home/Articulos/categoria">Categoria</a></li>
+        <li class="py-2 cursor-pointer"><a routerLink="/home/articulos/productos">Productos</a></li>
+        <li class="py-2 cursor-pointer"><a routerLink="/home/articulos/categoria">Categoria</a></li>
         <li class="py-2 cursor-pointer"><a routerLink="/home/articulos/proveedores">Proveedores</a></li>
       </ul>
 
@@ -43,13 +43,21 @@
         </svg>
       </li>
       <ul *ngIf="isDropdownOpen.inventario" class="pl-8">
-        <li class="py-2 cursor-pointer"><a routerLink="/home/inventario">Ver inventario</a></li>
-        <li class="py-2 cursor-pointer"><a routerLink="/home/inventario">Actualizar stock</a></li>
+        <li class="py-2 cursor-pointer"><a routerLink="/home/inventario/stock">Stock</a></li>
+        <li class="py-2 cursor-pointer"><a routerLink="/home/inventario/pedidos">Pedidos</a></li>
       </ul>
 
-      <li class="px-6 py-3 border-b border-[#B10303] flex items-center">
-        <span class="mr-2"><i class="fas fa-shopping-cart"></i></span> <a routerLink="/home/ventas">VENTAS</a>
+      <!-- Menú desplegable Ventas -->
+      <li class="px-6 py-3 border-b border-[#B10303] flex items-center cursor-pointer" (click)="toggleDropdown('ventas')">
+        <span class="mr-2"><i class="fas fa-clipboard-list"></i></span> VENTAS
+        <svg [class.rotate-180]="isDropdownOpen.inventario" class="ml-auto h-4 w-4 transition-transform" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+        </svg>
       </li>
+      <ul *ngIf="isDropdownOpen.ventas" class="pl-8">
+        <li class="py-2 cursor-pointer"><a routerLink="/home/ventas/">Ventas</a></li>
+        <li class="py-2 cursor-pointer"><a routerLink="/home/ventas/">Historial</a></li>
+      </ul>
 
       <!-- Menú desplegable Administración -->
       <li class="px-6 py-3 border-b border-[#B10303] flex items-center cursor-pointer" (click)="toggleDropdown('administracion')">
@@ -63,12 +71,22 @@
         <li class="py-2 cursor-pointer"><a routerLink="/home/administracion/contacto"><i class="fas fa-phone"></i> Contacto</a></li>
       </ul>
 
-      <li class="px-6 py-3 border-b border-[#B10303] flex items-center">
-        <span class="mr-2"><i class="fas fa-chart-bar"></i></span> <a routerLink="/home/reportes">REPORTES</a>
-      </li>
-    </ul>
-  </div>
+          <!-- Menú desplegable Reportes -->
+          <li class="px-6 py-3 border-b border-[#B10303] flex items-center cursor-pointer" (click)="toggleDropdown('reportes')">
+            <span class="mr-2"><i class="fas fa-cogs"></i></span> REPORTES
+            <svg [class.rotate-180]="isDropdownOpen.administracion" class="ml-auto h-4 w-4 transition-transform" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
+          </li>
+          <ul *ngIf="isDropdownOpen.reportes" class="pl-8">
+            <li class="py-2 cursor-pointer"><a routerLink="/home/reportes/usuarios"><i class="fas fa-users"></i> Usuarios</a></li>
+            <li class="py-2 cursor-pointer"><a routerLink="/home/reportes/ventas"><i class="fas fa-phone"></i> Ventas</a></li>
+            <li class="py-2 cursor-pointer"><a routerLink="/home/reportes/pedidos"><i class="fas fa-phone"></i> Pedidos</a></li>
+            <li class="py-2 cursor-pointer"><a routerLink="/home/reportes/inventario"><i class="fas fa-phone"></i> Inventario</a></li>
+          </ul>
 
+        </ul>
+  </div>
   <!-- Contenido principal -->
   <div class="flex-1 flex flex-col overflow-hidden">
     <!-- Navbar superior -->

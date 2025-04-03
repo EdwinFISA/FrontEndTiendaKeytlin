@@ -15,12 +15,12 @@ import { ContactoModalComponent } from './Menu/Administracion/Contacto/contacto-
 import { UsuariosComponent } from './Menu/Administracion/Usuarios/usuarios/usuarios.component';
 import { UsuarioModalComponent } from './Menu/Administracion/Usuarios/usuarios-modal/usuarios-modal.component';
 import { ProveedoresComponent } from './Menu/Articulos/proveedores/proveedores/proveedores.component';
-import { ProductosComponent } from './Menu/Articulos/productos/productos.component';
+import { ProductosComponent } from './Menu/Articulos/productos/productos/productos.component';
 import { AperturaCajaComponent } from './Menu/Caja/apertura-caja/apertura-caja.component';
 import { CierreCajaComponent } from './Menu/Caja/cierre-caja/cierre-caja.component';
 import { StockComponent } from './Menu/Inventario/stock/stock.component';
-import { PedidosComponent } from './Menu/Inventario/pedidos/pedidos.component';
-import { VentasComponent } from './Menu/Ventas/ventas/ventas.component';
+import { PedidosComponent } from './Menu/Inventario/pedidos/pedidos/pedidos.component';
+import { VentasComponent } from './Menu/Ventas/ventas/ventas/ventas.component';
 import { HistorialComponent } from './Menu/Ventas/historial/historial.component';
 import { ReporteUsuarioComponent } from './Menu/Reportes/reporte-usuario/reporte-usuario.component';
 import { ReporteVentaComponent } from './Menu/Reportes/reporte-venta/reporte-venta.component';
@@ -29,7 +29,12 @@ import { ReporteInventarioComponent } from './Menu/Reportes/reporte-inventario/r
 import { ProveedoresModalComponent } from './Menu/Articulos/proveedores/proveedores-modal/proveedores-modal.component';
 import { CategoriaComponent } from './Menu/Articulos/categoria/categoria/categoria.component';
 import { CategoriaModalComponent } from './Menu/Articulos/categoria/categoria-modal/categoria-modal.component';
+import { ProductosModalComponent } from './Menu/Articulos/productos/productos-modal/productos-modal.component';
+import { PedidosModalComponent } from './Menu/Inventario/pedidos/pedidos-modal/pedidos-modal.component';
+import { DetalleVentasComponent } from './Menu/Ventas/ventas/detalle-ventas/detalle-ventas.component';
+import { ReciboVentasComponent } from './Menu/Ventas/ventas/recibo-ventas/recibo-ventas.component';
 import { CommonModule } from '@angular/common';
+import { OlvidarContrasenaComponent } from './components/olvidar-contrasena/olvidar-contrasena.component';
 
 export function tokenGetter() {
   return localStorage.getItem('token');
@@ -53,7 +58,12 @@ export function tokenGetter() {
     ReportePedidosComponent,
     ReporteInventarioComponent,
     CategoriaComponent,
-    CategoriaModalComponent
+    CategoriaModalComponent,
+    ProductosModalComponent,
+    PedidosModalComponent,
+    DetalleVentasComponent,
+    ReciboVentasComponent,
+    OlvidarContrasenaComponent
   ],
   imports: [
     BrowserModule,
