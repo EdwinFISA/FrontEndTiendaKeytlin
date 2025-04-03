@@ -1,0 +1,99 @@
+  <div class="fixed inset-0 flex items-center justify-center z-50" style="background-color: rgba(0, 0, 0, 0.50);">
+    <div class="bg-white p-6 rounded-md w-[800px]">
+      <!-- Aumenté el ancho para acomodar 3 columnas -->
+      <h2 class="text-xl font-semibold mb-4">
+        {{ modoVer ? 'Ver' : (proveedor ? 'Editar' : 'Agregar') }} Proveedor
+      </h2>
+
+      <!-- Primera fila -->
+      <div class="grid grid-cols-3 gap-4 mb-4">
+        <!-- Nombre empresa -->
+        <div>
+          <label class="block text-left">Nombre de la empresa *</label>
+          <input type="text" [(ngModel)]="proveedorForm.nombre"
+                 [readonly]="modoVer"
+                 class="border p-2 w-full rounded-md" />
+        </div>
+
+        <!-- Nombre contacto -->
+        <div>
+          <label class="block text-left">Nombre del contacto *</label>
+          <input type="text" [(ngModel)]="proveedorForm.nombreContacto"
+                 [readonly]="modoVer"
+                 class="border p-2 w-full rounded-md" />
+        </div>
+
+        <!-- Número empresa -->
+        <div>
+          <label class="block text-left">Número de la empresa *</label>
+          <input type="text" [(ngModel)]="proveedorForm.telefono"
+                 [readonly]="modoVer"
+                 class="border p-2 w-full rounded-md" />
+        </div>
+      </div>
+
+      <!-- Segunda fila -->
+      <div class="grid grid-cols-3 gap-4 mb-4">
+        <!-- Número contacto -->
+        <div>
+          <label class="block text-left">Número del contacto</label>
+          <input type="text" [(ngModel)]="proveedorForm.telefonoContacto"
+                 [readonly]="modoVer"
+                 class="border p-2 w-full rounded-md" />
+        </div>
+
+        <!-- Dirección -->
+        <div>
+          <label class="block text-left">Dirección de la empresa *</label>
+          <input type="text" [(ngModel)]="proveedorForm.direccion"
+                 [readonly]="modoVer"
+                 class="border p-2 w-full rounded-md" />
+        </div>
+
+        <!-- Email -->
+        <div>
+          <label class="block text-left">Email de la empresa</label>
+          <input type="email" [(ngModel)]="proveedorForm.correo"
+                 [readonly]="modoVer"
+                 class="border p-2 w-full rounded-md" />
+        </div>
+      </div>
+
+      <!-- Tercera fila -->
+      <div class="grid grid-cols-3 gap-4 mb-4">
+        <!-- Estado -->
+        <div>
+          <label class="block text-left">Estado *</label>
+          <select [(ngModel)]="proveedorForm.estado"
+                  [disabled]="modoVer"
+                  class="border p-2 w-full rounded-md">
+            <option value="Activo">Activo</option>
+            <option value="Inactivo">Inactivo</option>
+          </select>
+        </div>
+
+        <!-- Descripción -->
+        <div class="col-span-2">
+          <label class="block text-left">Descripción</label>
+          <textarea [(ngModel)]="proveedorForm.descripcion"
+                    [readonly]="modoVer"
+                    rows="3"
+                    class="border p-2 w-full rounded-md"></textarea>
+        </div>
+      </div>
+
+      <!-- Botones alineados a la izquierda -->
+      <div class="flex justify-start gap-2 mt-4">
+        <button (click)="cerrarModal.emit()"
+                class="bg-[#B40001] text-white px-4 py-2 rounded-md">
+          {{ modoVer ? 'Cerrar' : 'Cancelar' }}
+        </button>
+        <button *ngIf="!modoVer"
+                (click)="guardar()"
+                class="bg-[#070826] text-white px-4 py-2 rounded-md">
+          Guardar
+        </button>
+      </div>
+    </div>
+  </div>
+

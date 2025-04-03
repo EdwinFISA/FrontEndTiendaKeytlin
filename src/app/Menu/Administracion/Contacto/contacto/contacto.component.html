@@ -1,0 +1,51 @@
+<!-- contacto.component.html -->
+<div class="max-w-2xl w-full mx-auto">
+  <div class="relative rounded-3xl border-4 border-[#0a215a] p-10 bg-white">
+    <div class="flex justify-between items-start">
+      <div class="space-y-6">
+        <h1 class="text-3xl font-bold text-[#051440]">Información de Empresa</h1>
+
+        <div class="mt-6">
+          <h2 class="text-4xl font-bold text-[#8b0000]">{{ empresa.nombre }}</h2>
+
+          <div class="mt-6 space-y-3">
+            <div>
+              <span class="font-bold text-[#8b0000]">Telefono: </span>
+              <span class="text-[#051440]">{{ empresa.telefono }}</span>
+            </div>
+
+            <div>
+              <span class="font-bold text-[#8b0000]">E-mail: </span>
+              <span class="text-[#051440]">{{ empresa.correo }}</span>
+            </div>
+
+            <div>
+              <span class="font-bold text-[#8b0000]">Dirección: </span>
+              <span class="text-[#051440]">{{ empresa.direccion }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-6">
+        <img src="/assets/images/Logo.png" alt="Logo Keytelin" class="h-30 w-30">
+      </div>
+    </div>
+
+    <div class="text-xs font-bold mt-1 text-center">TIENDA KEYTELIN</div>
+    <div class="w-16 border-t-2 border-[#c62828] mt-1"></div>
+
+    <div class="absolute bottom-6 right-6">
+      <button (click)="openModal()" class="bg-[#c62828] text-white px-6 py-2 rounded-md font-semibold flex items-center">
+        Editar Datos
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<app-contacto-modal *ngIf="isModalOpen"
+                    [empresa]="empresa"
+                    (close)="closeModal()"
+                    (guardar)="actualizarEmpresa($event)">
+</app-contacto-modal>

@@ -1,0 +1,11 @@
+C:\Users\guait\Desktop\TiendaKeytlin\tiendakeytlin.client\obj\Debug\tiendakeytlin.client.esproj.CoreCompileInputs.cache
+C:\Users\karin\OneDrive\Escritorio\TiendaKeytelinP\TiendaKeytlin\tiendakeytlin.client\obj\Debug\tiendakeytlin.client.esproj.CoreCompileInputs.cache
+C:\Users\guait\Desktop\Nueva carpeta (2)\TiendaKeytelin\tiendakeytlin.client\obj\Debug\tiendakeytlin.client.esproj.CoreCompileInputs.cache
+C:\Users\guait\Desktop\Nueva carpeta (2)\TiendaKeytelin - copia\tiendakeytlin.client\obj\Debug\tiendakeytlin.client.esproj.CoreCompileInputs.cache
+C:\Users\guait\Desktop\Nueva carpeta (2)\Tienda_Keytelin\tiendakeytlin.client\obj\Debug\tiendakeytlin.client.esproj.CoreCompileInputs.cache
+C:\Users\karin\OneDrive\Escritorio\Proyecto U\ProyectoTienda\TiendaKeytlinAngular-.netcore\tiendakeytlin.client\obj\Debug\tiendakeytlin.client.esproj.CoreCompileInputs.cache
+C:\Users\guait\Desktop\PROYECTO 2.0\TiendaKeytlinAngular-.netcore\tiendakeytlin.client\obj\Debug\tiendakeytlin.client.esproj.CoreCompileInputs.cache
+C:\Users\elektra\Proyecto\TiendaKeytlinAngular-.netcore\tiendakeytlin.client\obj\Debug\tiendakeytlin.client.esproj.CoreCompileInputs.cache
+C:\Users\karin\Documents\Proyecto IS\TiendaKeytlinAngular-.netcore\tiendakeytlin.client\obj\Debug\tiendakeytlin.client.esproj.CoreCompileInputs.cache
+C:\Users\guait\Desktop\Karina\TiendaKeytlinAngular-.netcore\tiendakeytlin.client\obj\Debug\tiendakeytlin.client.esproj.CoreCompileInputs.cache
+C:\Users\karin\OneDrive\Escritorio\Prueba\TiendaKeytlinAngular-.netcore\tiendakeytlin.client\obj\Debug\tiendakeytlin.client.esproj.CoreCompileInputs.cache

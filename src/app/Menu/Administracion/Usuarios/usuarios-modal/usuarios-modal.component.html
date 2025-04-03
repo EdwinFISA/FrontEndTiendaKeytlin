@@ -1,0 +1,165 @@
+<div class="fixed inset-0 flex items-center justify-center z-50">
+  <div class="absolute inset-0 bg-black opacity-50"></div>
+  <div class="bg-white rounded-lg shadow-lg p-6 relative z-10 w-full max-w-4xl">
+    <span class="absolute top-0 right-0 p-4 cursor-pointer" (click)="cerrarModal()">&times;</span>
+    <h2 class="text-2xl font-bold mb-2">
+      {{ modoVista ? 'Detalles del usuario' : usuario.Id ? 'Editar usuario' : 'Crear nuevo usuario' }}
+    </h2>
+
+    <div class="border-b border-gray-300 w-full mb-6"></div>
+
+    <form (ngSubmit)="!modoVista && onSubmit()" #usuarioForm="ngForm">
+      <fieldset [disabled]="modoVista">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Nombre -->
+          <div class="mb-4">
+            <label for="nombre" class="block text-sm font-medium mb-1">
+              Nombre <span class="text-red-600">*</span>
+            </label>
+            <input type="text" id="nombre" [(ngModel)]="usuario.Nombre" name="nombre" required
+              [class.bg-gray-100]="modoVista"
+              class="border border-gray-300 rounded w-full py-2 px-3 text-gray-700 focus:outline-none focus:border-blue-500">
+          </div>
+
+          <!-- Apellido -->
+          <div class="mb-4">
+            <label for="apellido" class="block text-sm font-medium mb-1">
+              Apellido <span class="text-red-600">*</span>
+            </label>
+            <input type="text" id="apellido" [(ngModel)]="usuario.Apellido" name="apellido" required
+              [class.bg-gray-100]="modoVista"
+              class="border border-gray-300 rounded w-full py-2 px-3 text-gray-700 focus:outline-none focus:border-blue-500">
+          </div>
+
+          <!-- Correo -->
+          <div class="mb-4">
+            <label for="correo" class="block text-sm font-medium mb-1">
+              Correo electrónico <span class="text-red-600">*</span>
+            </label>
+            <input type="email" id="correo" [(ngModel)]="usuario.Correo" name="correo" required
+              [class.bg-gray-100]="modoVista"
+              class="border border-gray-300 rounded w-full py-2 px-3 text-gray-700 focus:outline-none focus:border-blue-500">
+          </div>
+
+          <!-- Teléfono -->
+          <div class="mb-4">
+            <label for="telefono" class="block text-sm font-medium mb-1">
+              Teléfono <span class="text-red-600">*</span>
+            </label>
+            <input type="tel" id="telefono" [(ngModel)]="usuario.Telefono" name="telefono" required
+              [class.bg-gray-100]="modoVista"
+              class="border border-gray-300 rounded w-full py-2 px-3 text-gray-700 focus:outline-none focus:border-blue-500">
+          </div>
+
+        <!-- Estado -->
+        <div class="mb-4">
+          <label for="estado" class="block text-sm font-medium mb-1">
+            Estado<span class="text-red-600">*</span>
+          </label>
+          <div class="relative">
+            <select id="estado"
+                    [(ngModel)]="usuario.EstadoId"
+                    name="estado"
+                    required
+                    class="border border-gray-300 rounded w-full py-2 px-3 text-gray-700 focus:outline-none focus:border-blue-500 appearance-none">
+              <option value="">Seleccione un estado</option>
+              <option *ngFor="let estado of estados"
+                      [ngValue]="estado.Id || estado.id">
+                {{estado.Nombre || estado.nombre}}
+              </option>
+            </select>
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+              <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+              </svg>
+            </div>
+            <div *ngIf="estados.length === 0" class="text-sm text-gray-500 mt-1">
+              Cargando estados... ({{estados.length}} cargados)
+            </div>
+          </div>
+        </div>
+        
+                  <!-- Rol -->
+        <div class="mb-4">
+          <label for="rol" class="block text-sm font-medium mb-1">
+            Rol<span class="text-red-600">*</span>
+          </label>
+          <div class="relative">
+            <select id="rol"
+                    [(ngModel)]="usuario.RolId"
+                    name="rol"
+                    required
+                    class="border border-gray-300 rounded w-full py-2 px-3 text-gray-700 focus:outline-none focus:border-blue-500 appearance-none">
+              <option value="">Seleccione un rol</option>
+              <option *ngFor="let rol of roles"
+                      [ngValue]="rol.Id || rol.id">
+                {{rol.Nombre || rol.nombre}}
+              </option>
+            </select>
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+              <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+              </svg>
+            </div>
+            <div *ngIf="roles.length === 0" class="text-sm text-gray-500 mt-1">
+              Cargando roles... ({{roles.length}} cargados)
+            </div>
+          </div>
+        </div>
+
+          <!-- Imagen -->
+          <div class="mb-4">
+            <label class="block text-sm font-medium mb-1">
+              Imagen del usuario
+            </label>
+
+            <!-- Vista previa de la imagen -->
+            <div class="mb-3" *ngIf="imagenPrevia">
+              <img [src]="imagenPrevia" alt="Vista previa de imagen"
+                class="h-24 w-24 object-cover rounded-lg border border-gray-200">
+            </div>
+
+            <!-- Botón para cargar imagen -->
+            <div class="flex items-center" *ngIf="!modoVista">
+              <input type="file" id="fileInput" accept="image/jpeg, image/png" (change)="onFileSelected($event)"
+                class="hidden">
+
+              <button type="button" (click)="onFileInputClick()" [disabled]="cargando"
+                class="bg-[#011552] hover:bg-[#002a7a] text-white font-medium py-2 px-4 rounded transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                <i class="fas fa-upload mr-2"></i>
+                <span *ngIf="!cargando">Seleccionar imagen</span>
+                <span *ngIf="cargando">Cargando...</span>
+              </button>
+
+              <!-- Nombre del archivo seleccionado -->
+              <span class="ml-3 text-sm text-gray-600" *ngIf="usuario.Imagen">
+                {{ usuario.Imagen }}
+              </span>
+            </div>
+            <p class="text-xs text-gray-500 mt-1">Formatos aceptados: JPG, PNG (Máx. 2MB)</p>
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- Spinner de carga (se muestra encima del modal) -->
+      <div *ngIf="cargando" class="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+        <div class="bg-white p-4 rounded-lg shadow-lg">
+          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-[#011552] mx-auto"></div>
+          <p class="mt-2 text-center">Procesando...</p>
+        </div>
+      </div>
+
+      <!-- Botones -->
+      <div class="flex justify-end mt-6 space-x-3">
+        <button type="button" (click)="cerrarModal()"
+          class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+          {{ modoVista ? 'Cerrar' : 'Cancelar' }}
+        </button>
+        <button type="submit" *ngIf="!modoVista" [disabled]="!usuarioForm.form.valid || cargando"
+          class="px-4 py-2 border border-transparent rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed">
+          Guardar
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

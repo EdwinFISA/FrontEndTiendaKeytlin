@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.VisualStudio.JavaScript.Sdk/1.0.2191419">
+  <PropertyGroup>
+    <StartupCommand>npm start</StartupCommand>
+    <JavaScriptTestFramework>Jasmine</JavaScriptTestFramework>
+    <!-- Allows the build (or compile) script located on package.json to run on Build -->
+    <ShouldRunBuildScript>false</ShouldRunBuildScript>
+    <!-- Folder where production build objects will be placed -->
+    <BuildOutputFolder>$(MSBuildProjectDirectory)\dist\tiendakeytlin.client\browser\</BuildOutputFolder>
+  </PropertyGroup>
+  <ItemGroup>
+    <Folder Include="src\app\Menu\Administracion\Contacto\" />
+    <Folder Include="src\app\Menu\Administracion\Usuarios\" />
+    <Folder Include="src\app\Menu\Caja\" />
+    <Folder Include="src\app\Menu\Inventario\" />
+    <Folder Include="src\app\Menu\Reportes\" />
+    <Folder Include="src\app\Menu\Ventas\" />
+  </ItemGroup>
+</Project>

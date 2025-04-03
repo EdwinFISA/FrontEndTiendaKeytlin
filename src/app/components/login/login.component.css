@@ -1,0 +1,29 @@
+
+.border-red-500 {
+  border-color: red;
+}
+
+.field-spacing {
+  margin-bottom: 1cm;
+}
+
+
+/* Añade esto a tu archivo de estilos (styles.css o el archivo de componente) */
+.no-native-eye-icon::-ms-reveal,
+.no-native-eye-icon::-ms-clear,
+.no-native-eye-icon::-webkit-contacts-auto-fill-button,
+.no-native-eye-icon::-webkit-credentials-auto-fill-button {
+  display: none !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+}
+
+/* Para navegadores basados en Chromium */
+.no-native-eye-icon::-webkit-inner-spin-button,
+.no-native-eye-icon::-webkit-search-cancel-button,
+.no-native-eye-icon::-webkit-search-decoration,
+.no-native-eye-icon::-webkit-search-results-button,
+.no-native-eye-icon::-webkit-search-results-decoration {
+  -webkit-appearance: none;
+  display: none !important;
+}

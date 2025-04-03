@@ -1,0 +1,96 @@
+<div class="p-4">
+  <div class="flex justify-between items-center mb-4">
+    <div></div>
+    <h2 class="text-2xl font-semibold">Proveedores</h2>
+  </div>
+
+  <!-- Contenedor para filtros y botón -->
+  <div class="flex flex-col items-start gap-4 mb-4">
+    <!-- Buscador -->
+    <div class="flex border rounded-md p-2">
+      <input type="text"
+             placeholder="Buscar proveedor"
+             class="outline-none px-2"
+             [(ngModel)]="filtroProveedor"
+             (keyup.enter)="buscarProveedor()" />
+      <button (click)="buscarProveedor()" class="ml-2 text-blue-500">
+        🔍
+      </button>
+    </div>
+
+    <!-- Modal -->
+    <app-proveedores-modal *ngIf="mostrarModal"
+                           [proveedor]="proveedorSeleccionado"
+                           [modoVer]="modoVer"
+                           (cerrarModal)="cerrarModal()"
+                           (guardarProveedor)="manejarProveedorGuardado($event)">
+    </app-proveedores-modal>
+
+    <!-- Botón Agregar proveedor -->
+    <button class="bg-black text-white px-4 py-2 rounded-md"
+            (click)="abrirModal()">
+      Agregar proveedor
+    </button>
+
+    <!-- Contenedor de tabla sin scroll -->
+    <div class="shadow-md sm:rounded-lg w-full">
+      <table class="w-full divide-y divide-gray-200">
+        <thead class="bg-gray-100">
+          <tr>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre Empresa</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contacto</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Teléfono</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <tr *ngFor="let proveedor of proveedoresPaginados()" class="hover:bg-gray-50">
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ proveedor.id }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ proveedor.nombre }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ proveedor.nombreContacto }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ proveedor.telefono }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ proveedor.estado }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 flex space-x-2">
+              <button class="text-blue-500 hover:text-blue-700" (click)="abrirModal(proveedor, true)">
+                👁️
+              </button>
+              <button class="text-green-500 hover:text-green-700" (click)="abrirModal(proveedor)">
+                ✏️
+              </button>
+              <button class="text-red-500 hover:text-red-700" (click)="eliminarProveedor(proveedor.id)">
+                ❌
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Paginación alineada a la derecha -->
+    <div class="flex justify-end mt-4 space-x-2 w-full">
+      <button class="px-3 py-1 border rounded-md bg-[#011552] text-white"
+              [disabled]="paginaActual === 1"
+              (click)="paginaAnterior()">
+        Anterior
+      </button>
+
+      <!-- Números de página -->
+      <button *ngFor="let page of getPaginas()"
+              class="px-3 py-1 border rounded-md"
+              [class.bg-blue-500]="page === paginaActual"
+              [class.text-white]="page === paginaActual"
+              [class.text-gray-700]="page !== paginaActual"
+              (click)="irAPagina(page)">
+        {{ page }}
+      </button>
+
+      <button class="px-3 py-1 border rounded-md bg-[#011552] text-white"
+              [disabled]="paginaActual === totalPaginas()"
+              (click)="paginaSiguiente()">
+        Siguiente
+      </button>
+    </div>
+  </div>
+</div>

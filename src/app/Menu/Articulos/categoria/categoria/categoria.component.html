@@ -1,0 +1,83 @@
+<div class="bg-white shadow-md p-6 rounded-lg">
+  <!-- Filtros -->
+  <div class="flex flex-wrap gap-4 mb-4">
+    <div class="flex border rounded-md p-1">
+      <input type="text"
+             placeholder="Buscar Proveedor"
+             class="outline-none px-1"
+             [(ngModel)]="filtroCategoria" />
+      <button (click)="buscarProveedor()" class="ml-2 text-blue-500">
+        🔍
+      </button>
+    </div>
+
+    <div class="flex gap-2">
+      <input type="date"
+             class="border rounded-md p-2"
+             [(ngModel)]="fechaInicio" />
+      <input type="date"
+             class="border rounded-md p-2"
+             [(ngModel)]="fechaFin" />
+      <button (click)="filtrarPorFecha()"
+              class="bg-blue-700 text-white px-4 py-2 rounded-md">
+        Generar
+      </button>
+    </div>
+  </div>
+
+  <!-- Botón Agregar Categoría -->
+  <button class="bg-black text-white px-4 py-2 rounded-md mb-4 block w-fit"
+          (click)="abrirModalCrear()">
+    Agregar Categoría
+  </button>
+
+
+  <!-- Tabla -->
+  <div class="overflow-x-auto">
+    <table class="w-full border-collapse border">
+      <thead>
+        <tr class="bg-gray-200">
+          <th class="p-3 border">ID</th>
+          <th class="p-3 border">Nombre de Categoría</th>
+          <th class="p-3 border">Descripción de Categoría</th>
+          <th class="p-3 border">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let categoria of categorias" class="text-center">
+          <td class="p-3 border">{{ categoria.id }}</td>
+          <td class="p-3 border">{{ categoria.nombre }}</td>
+          <td class="p-3 border">{{ categoria.descripcion }}</td>
+          <td class="p-3 border">
+            <button class="text-blue-500">👁️</button>
+            <button class="text-gray-500">✏️</button>
+            <button class="text-red-500">❌</button>
+
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>S
+
+  <!-- Paginación -->
+  <div class="flex justify-end items-center p-4 space-x-2 mt-4">
+    <button class="bg-blue-700 text-white px-4 py-2 rounded-lg">Anterior</button>
+
+    <div class="flex space-x-2">
+      <button class="border px-3 py-1 rounded-lg">1</button>
+      <button class="border px-3 py-1 rounded-lg">2</button>
+      <button class="border px-3 py-1 rounded-lg">3</button>
+    </div>
+
+    <button class="bg-blue-700 text-white px-4 py-2 rounded-lg">Siguiente</button>
+  </div>
+
+
+
+  <!-- Modal -->
+  <app-categoria-modal *ngIf="mostrarModal"
+                       (cerrar)="cerrarModal()">
+  </app-categoria-modal>
+</div>
+
+
