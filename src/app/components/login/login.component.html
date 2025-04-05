@@ -80,10 +80,16 @@
         </div>
       </form>
 
-      <!-- Enlace de olvidaste contraseña -->
-      <div class="mt-4 text-center">
-        <a href="#" class="text-red-600 text-sm hover:underline">¿Olvidaste tu contraseña?</a>
-      </div>
+
+<!-- Enlace de olvidaste contraseña -->
+<div class="mt-4 text-center">
+  <a href="olvidaste" class="text-red-600 text-sm hover:underline" (click)="abrirModal()">¿Olvidaste tu contraseña?</a>
+</div>
+
+<!-- Modal de Olvidar Contraseña -->
+<app-olvidar-contrasena *ngIf="mostrarModal" (cerrar)="cerrarModal()">
+
+</app-olvidar-contrasena>
     </div>
   </div>
 </div>

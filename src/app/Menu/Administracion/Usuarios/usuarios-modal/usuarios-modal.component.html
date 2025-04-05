@@ -1,115 +1,225 @@
 <div class="fixed inset-0 flex items-center justify-center z-50">
   <div class="absolute inset-0 bg-black opacity-50"></div>
   <div class="bg-white rounded-lg shadow-lg p-6 relative z-10 w-full max-w-4xl">
+    <div class="max-h-[75vh] overflow-y-auto rounded-lg pr-2">
+
     <span class="absolute top-0 right-0 p-4 cursor-pointer" (click)="cerrarModal()">&times;</span>
-    <h2 class="text-2xl font-bold mb-2">
+    <h2 class="text-2xl font-bold mb-4 border-b pb-2 text-left">
       {{ modoVista ? 'Detalles del usuario' : usuario.Id ? 'Editar usuario' : 'Crear nuevo usuario' }}
     </h2>
 
-    <div class="border-b border-gray-300 w-full mb-6"></div>
-
-    <form (ngSubmit)="!modoVista && onSubmit()" #usuarioForm="ngForm">
+    <form (ngSubmit)="!modoVista && onSubmit()" #usuarioForm="ngForm" novalidate>
       <fieldset [disabled]="modoVista">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <!-- Nombre -->
           <div class="mb-4">
-            <label for="nombre" class="block text-sm font-medium mb-1">
-              Nombre <span class="text-red-600">*</span>
+            <label for="nombre" class="block text-sm font-medium mb-1 text-left" style="color: #670305;">
+              Nombre <span style="color: #670305;">*</span>
             </label>
-            <input type="text" id="nombre" [(ngModel)]="usuario.Nombre" name="nombre" required
+            <input
+              type="text"
+              id="nombre"
+              name="nombre"
+              maxlength="50"
+              pattern="^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$"
+              [(ngModel)]="usuario.Nombre"
+              #nombre="ngModel"
+              required
               [class.bg-gray-100]="modoVista"
-              class="border border-gray-300 rounded w-full py-2 px-3 text-gray-700 focus:outline-none focus:border-blue-500">
+              class="rounded w-full py-2 px-3 focus:outline-none focus:ring-1"
+              style="border: 1px solid #070826; color: #670305;"
+            />
+          
+            <!-- Mensajes de error -->
+            <div *ngIf="nombre.invalid && (nombre.dirty || nombre.touched)" class="text-red-500 text-sm mt-1">
+              <div *ngIf="nombre.errors?.['required']">El nombre es obligatorio.</div>
+              <div *ngIf="nombre.errors?.['maxlength']">El nombre no debe exceder los 50 caracteres.</div>
+              <div *ngIf="nombre.errors?.['pattern']">Solo se permiten letras y espacios.</div>
+            </div>
           </div>
 
           <!-- Apellido -->
           <div class="mb-4">
-            <label for="apellido" class="block text-sm font-medium mb-1">
-              Apellido <span class="text-red-600">*</span>
+            <label for="apellido" class="block text-sm font-medium mb-1 text-left" style="color: #670305;">
+              Apellido <span style="color: #670305;">*</span>
             </label>
-            <input type="text" id="apellido" [(ngModel)]="usuario.Apellido" name="apellido" required
+            <input
+              type="text"
+              id="apellido"
+              name="apellido"
+              maxlength="50"
+              pattern="^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$"
+              [(ngModel)]="usuario.Apellido"
+              #apellido="ngModel"
+              required
               [class.bg-gray-100]="modoVista"
-              class="border border-gray-300 rounded w-full py-2 px-3 text-gray-700 focus:outline-none focus:border-blue-500">
+              class="rounded w-full py-2 px-3 focus:outline-none focus:ring-1"
+              style="border: 1px solid #070826; color: #670305;"
+            />
+          
+            <!-- Mensajes de error -->
+            <div *ngIf="apellido.invalid && (apellido.dirty || apellido.touched)" class="text-red-500 text-sm mt-1">
+              <div *ngIf="apellido.errors?.['required']">El apellido es obligatorio.</div>
+              <div *ngIf="apellido.errors?.['maxlength']">El apellido no debe exceder los 50 caracteres.</div>
+              <div *ngIf="apellido.errors?.['pattern']">Solo se permiten letras y espacios.</div>
+            </div>
           </div>
+          
+          
 
           <!-- Correo -->
           <div class="mb-4">
-            <label for="correo" class="block text-sm font-medium mb-1">
-              Correo electrónico <span class="text-red-600">*</span>
+            <label for="correo" class="block text-sm font-medium mb-1 text-left" style="color: #670305;">
+              Correo electrónico <span style="color: #670305;">*</span>
             </label>
-            <input type="email" id="correo" [(ngModel)]="usuario.Correo" name="correo" required
+            <input
+              type="email"
+              id="correo"
+              name="correo"
+              [(ngModel)]="usuario.Correo"
+              #correo="ngModel"
+              required
               [class.bg-gray-100]="modoVista"
-              class="border border-gray-300 rounded w-full py-2 px-3 text-gray-700 focus:outline-none focus:border-blue-500">
-          </div>
+              class="rounded w-full py-2 px-3 focus:outline-none focus:ring-1"
+              style="border: 1px solid #070826; color: #670305;"
+            />
+          
+            <!-- Mensajes de error -->
+            <div *ngIf="correo.invalid && (correo.dirty || correo.touched)" class="text-red-500 text-sm mt-1">
+              <div *ngIf="correo.errors?.['required']">El correo electrónico es obligatorio.</div>
+              <div *ngIf="correo.errors?.['email']">El formato del correo no es válido.</div>
+            </div>
+          </div>          
+          
 
           <!-- Teléfono -->
           <div class="mb-4">
-            <label for="telefono" class="block text-sm font-medium mb-1">
-              Teléfono <span class="text-red-600">*</span>
+            <label for="correo" class="block text-sm font-medium mb-1 text-left" style="color: #670305;">
+              Teléfono <span style="color: #670305;">*</span>
             </label>
-            <input type="tel" id="telefono" [(ngModel)]="usuario.Telefono" name="telefono" required
+            <input
+              type="tel"
+              id="telefono"
+              name="telefono"
+              [(ngModel)]="usuario.Telefono"
+              #telefono="ngModel"
+              required
+              pattern="^[0-9]{8}$"
+              maxlength="8"
+              inputmode="numeric"
               [class.bg-gray-100]="modoVista"
-              class="border border-gray-300 rounded w-full py-2 px-3 text-gray-700 focus:outline-none focus:border-blue-500">
+              class="rounded w-full py-2 px-3 focus:outline-none focus:ring-1"
+              style="border: 1px solid #070826; color: #670305;"
+            />
+
+            <!-- Mensajes de error -->
+            <div *ngIf="telefono.invalid && (telefono.dirty || telefono.touched)" class="text-red-500 text-sm mt-1">
+              <div *ngIf="telefono.errors?.['required']">El número de teléfono es obligatorio.</div>
+              <div *ngIf="telefono.errors?.['pattern']">Debe contener exactamente 8 dígitos numéricos.</div>
+            </div>
+          </div>
+          
+          
+          <!-- Fecha de nacimiento -->
+          <div class="mb-4">
+            <label for="fechaNacimiento" class="block text-sm font-medium mb-1 text-left" style="color: #670305;">
+              Fecha de nacimiento <span style="color: #670305;">*</span>
+            </label>
+            <input
+              type="date"
+              id="fechaNacimiento"
+              name="fechaNacimiento"
+              [(ngModel)]="usuario.FechaNacimiento"
+              #fechaNacimiento="ngModel"
+              required
+              [min]="minFechaNacimiento" 
+              [max]="maxFechaNacimiento" 
+              (change)="calcularEdad()"
+              [class.bg-gray-100]="modoVista"
+              class="rounded w-full py-2 px-3 focus:outline-none focus:ring-1"
+              style="border: 1px solid #070826; color: #670305;"
+            />
+
+            <!-- Mensajes de error -->
+            <div *ngIf="fechaNacimiento.invalid && (fechaNacimiento.dirty || fechaNacimiento.touched)" class="text-red-500 text-sm mt-1">
+              <div *ngIf="fechaNacimiento.errors?.['required']">La fecha de nacimiento es obligatoria.</div>
+              <div *ngIf="fechaNacimiento.errors?.['min']">Debe ser mayor o igual a 01/01/1940.</div>
+              <div *ngIf="fechaNacimiento.errors?.['max']">La fecha no puede ser futura.</div>
+            </div>
           </div>
 
-        <!-- Estado -->
-        <div class="mb-4">
-          <label for="estado" class="block text-sm font-medium mb-1">
-            Estado<span class="text-red-600">*</span>
-          </label>
-          <div class="relative">
-            <select id="estado"
-                    [(ngModel)]="usuario.EstadoId"
-                    name="estado"
-                    required
-                    class="border border-gray-300 rounded w-full py-2 px-3 text-gray-700 focus:outline-none focus:border-blue-500 appearance-none">
-              <option value="">Seleccione un estado</option>
-              <option *ngFor="let estado of estados"
-                      [ngValue]="estado.Id || estado.id">
-                {{estado.Nombre || estado.nombre}}
-              </option>
-            </select>
-            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-              <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-              </svg>
-            </div>
-            <div *ngIf="estados.length === 0" class="text-sm text-gray-500 mt-1">
-              Cargando estados... ({{estados.length}} cargados)
+          <!-- Edad -->
+          <div class="mb-4">
+            <label for="edad" class="block text-sm font-medium mb-1 text-left" style="color: #670305;">
+              Edad
+            </label>
+            <input
+              type="text"
+              id="edad"
+              name="edad"
+              [value]="edad"
+              readonly
+              class="rounded w-full py-2 px-3 bg-gray-100 focus:outline-none"
+              style="border: 1px solid #070826; color: #670305;"
+            />
+          </div>
+          
+          <!-- Estado -->
+          <div class="mb-4">
+            <label for="estado" class="block text-sm font-medium mb-1 text-left" style="color: #670305;">
+              Estado<span class="text-red-600">*</span>
+            </label>
+            <div class="relative">
+              <select id="estado"
+                      [(ngModel)]="usuario.EstadoId"
+                      name="estado"
+                      required
+                      class="border rounded w-full py-2 px-3 text-gray-700 focus:outline-none focus:ring-1 appearance-none"
+                      style="border: 1px solid #070826; color: #670305;">
+                <option value="">Seleccione un estado</option>
+                <option *ngFor="let estado of estados"
+                        [ngValue]="estado.Id || estado.id">
+                  {{estado.Nombre || estado.nombre}}
+                </option>
+              </select>
+              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                  <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                </svg>
+              </div>
             </div>
           </div>
-        </div>
-        
-                  <!-- Rol -->
-        <div class="mb-4">
-          <label for="rol" class="block text-sm font-medium mb-1">
-            Rol<span class="text-red-600">*</span>
-          </label>
-          <div class="relative">
-            <select id="rol"
-                    [(ngModel)]="usuario.RolId"
-                    name="rol"
-                    required
-                    class="border border-gray-300 rounded w-full py-2 px-3 text-gray-700 focus:outline-none focus:border-blue-500 appearance-none">
-              <option value="">Seleccione un rol</option>
-              <option *ngFor="let rol of roles"
-                      [ngValue]="rol.Id || rol.id">
-                {{rol.Nombre || rol.nombre}}
-              </option>
-            </select>
-            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-              <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-              </svg>
-            </div>
-            <div *ngIf="roles.length === 0" class="text-sm text-gray-500 mt-1">
-              Cargando roles... ({{roles.length}} cargados)
+
+          <!-- Rol -->
+          <div class="mb-4">
+            <label for="rol" class="block text-sm font-medium mb-1 text-left" style="color: #670305;">
+              Rol<span class="text-red-600">*</span>
+            </label>
+            <div class="relative">
+              <select id="rol"
+                      [(ngModel)]="usuario.RolId"
+                      name="rol"
+                      required
+                      class="border rounded w-full py-2 px-3 text-gray-700 focus:outline-none focus:ring-1 appearance-none"
+                      style="border: 1px solid #070826; color: #670305;">
+                <option value="">Seleccione un rol</option>
+                <option *ngFor="let rol of roles"
+                        [ngValue]="rol.Id || rol.id">
+                  {{rol.Nombre || rol.nombre}}
+                </option>
+              </select>
+              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                  <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                </svg>
+              </div>
             </div>
           </div>
-        </div>
+
 
           <!-- Imagen -->
           <div class="mb-4">
-            <label class="block text-sm font-medium mb-1">
+            <label class="block text-sm font-medium mb-1 text-left">
               Imagen del usuario
             </label>
 
@@ -152,14 +262,16 @@
       <!-- Botones -->
       <div class="flex justify-end mt-6 space-x-3">
         <button type="button" (click)="cerrarModal()"
-          class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+          class="px-4 py-2 border border-gray-300 rounded-md text-white bg-[#B40001] hover:bg-[#9b0000] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
           {{ modoVista ? 'Cerrar' : 'Cancelar' }}
         </button>
+
         <button type="submit" *ngIf="!modoVista" [disabled]="!usuarioForm.form.valid || cargando"
-          class="px-4 py-2 border border-transparent rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed">
+        class="px-4 py-2 border border-transparent rounded-md shadow-sm text-white bg-[#070826] hover:bg-[#05061c] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed">
           Guardar
         </button>
       </div>
     </form>
   </div>
+</div>
 </div>

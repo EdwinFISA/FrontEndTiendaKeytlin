@@ -11,15 +11,19 @@ export interface LoginModel {
 
 export interface LoginResponse {
   token: string;
-  expiration: string;
-  name: string;
   userId: number;
+  userName: string;
+  userApellido: string;
+  userEmail: string;
+  userRole: string;
 }
 
 export interface User {
   id: number;
   email: string;
   name: string;
+  apellido: string;
+  role: string;
 }
 
 @Injectable({
@@ -46,7 +50,10 @@ export class AuthService {
 
   login(loginData: LoginModel): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(`${this.apiUrl}/login`, loginData).pipe(
-      tap(response => this.handleLoginSuccess(response, loginData.email)),
+      tap(response => {
+        console.log('Login response:', response); // Agregar para debug
+        this.handleLoginSuccess(response);
+      }),
       catchError(error => {
         console.error('Login error:', error);
         return throwError(() => this.getLoginErrorMessage(error));
@@ -71,11 +78,21 @@ export class AuthService {
 
   isAuthenticated(): boolean {
     const token = localStorage.getItem('token');
-    const expiration = localStorage.getItem('tokenExpiration');
-
-    if (!token || !expiration) return false;
-
-    return new Date(expiration) > new Date();
+    
+    if (!token) return false;
+    
+    // En una aplicación real, también deberías validar la expiración del token
+    try {
+      // Verificar si el token no está expirado usando fecha de expiración almacenada
+      const expiration = localStorage.getItem('tokenExpiration');
+      if (expiration) {
+        return new Date(expiration) > new Date();
+      }
+      return true;
+    } catch (e) {
+      console.error('Error al verificar la autenticación:', e);
+      return false;
+    }
   }
 
   getToken(): string | null {
@@ -91,26 +108,52 @@ export class AuthService {
     );
   }
 
-  private handleLoginSuccess(response: LoginResponse, email: string): void {
-    // Store token and user data
+  private handleLoginSuccess(response: LoginResponse): void {
+    console.log('Handling login success:', response);
+    
+    // Store token
     localStorage.setItem('token', response.token);
-    localStorage.setItem('tokenExpiration', response.expiration);
+    
+    // Extraer fecha de expiración del token (opcional, pero útil)
+    try {
+      // Si usas JWT, puedes decodificarlo para obtener la expiración
+      const payload = JSON.parse(atob(response.token.split('.')[1]));
+      const expirationDate = new Date(payload.exp * 1000).toISOString();
+      localStorage.setItem('tokenExpiration', expirationDate);
+      console.log('Token expiration set:', expirationDate);
+    } catch (e) {
+      console.error('Error extracting token expiration:', e);
+      // Si no puedes extraer la expiración, establece un tiempo predeterminado (24h)
+      const expirationDate = new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toISOString();
+      localStorage.setItem('tokenExpiration', expirationDate);
+    }
 
+    // Store user data
     const user: User = {
       id: response.userId,
-      email: email,
-      name: response.name
+      email: response.userEmail,
+      name: response.userName,
+      apellido: response.userApellido,
+      role: response.userRole
     };
 
     localStorage.setItem('currentUser', JSON.stringify(user));
     this.currentUserSubject.next(user);
 
     // Set auto logout timer
-    this.setAutoLogoutTimer(response.expiration);
+    const expiration = localStorage.getItem('tokenExpiration');
+    if (expiration) {
+      this.setAutoLogoutTimer(expiration);
+    }
+    
+    console.log('Login completed successfully, user stored:', user);
   }
 
   private setAutoLogoutTimer(expiration: string): void {
-    const expirationDuration = new Date(expiration).getTime() - Date.now();
+    const expirationDate = new Date(expiration);
+    const expirationDuration = expirationDate.getTime() - Date.now();
+
+    console.log(`Setting auto logout timer for ${expirationDuration}ms (${new Date(Date.now() + expirationDuration)})`);
 
     // Clear existing timer if any
     if (this.tokenExpirationTimer) {
@@ -118,6 +161,7 @@ export class AuthService {
     }
 
     this.tokenExpirationTimer = setTimeout(() => {
+      console.log('Auto logout triggered');
       this.logout().subscribe();
     }, expirationDuration);
   }
@@ -151,8 +195,8 @@ export class AuthService {
       return new Error(error.error.message);
     }
     if (error.status === 0) {
-      return new Error('Network error: Please check your internet connection');
+      return new Error('Network error: Compruebe su Conexión a internet');
     }
-    return new Error('Login failed: Please check your credentials');
+    return new Error('Login failed: Compruebe su Correo o Contraseña');
   }
 }

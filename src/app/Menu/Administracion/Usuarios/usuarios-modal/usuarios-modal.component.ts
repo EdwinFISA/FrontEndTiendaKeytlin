@@ -12,6 +12,7 @@ interface Usuario {
   Apellido?: string;
   Correo?: string;
   Telefono?: string;
+  FechaNacimiento?: '',
   Imagen?: string;
   EstadoId?: number;
   RolId?: number;
@@ -59,6 +60,17 @@ export class UsuarioModalComponent implements OnInit {
 
     if (this.usuario.Imagen) {
       this.imagenPrevia = this.getImagenUrl(this.usuario.Imagen);
+    }
+  }
+  minFechaNacimiento = '1940-01-01'; // Fecha mínima
+  maxFechaNacimiento = new Date().toISOString().split('T')[0]; // Fecha máxima (hoy)
+  edad!: number;
+
+  calcularEdad() {
+    if (this.usuario.FechaNacimiento) {
+      const fechaNacimiento = new Date(this.usuario.FechaNacimiento);
+      const diferencia = Date.now() - fechaNacimiento.getTime();
+      this.edad = new Date(diferencia).getUTCFullYear() - 1970;
     }
   }
 

@@ -1,11 +1,17 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 
 @Component({
   selector: 'app-olvidar-contrasena',
-  standalone: false,
   templateUrl: './olvidar-contrasena.component.html',
-  styleUrl: './olvidar-contrasena.component.css'
+  styleUrls: ['./olvidar-contrasena.component.css']
 })
 export class OlvidarContrasenaComponent {
 
+  // Declara un Output para emitir un evento al componente padre
+  @Output() cerrar = new EventEmitter<void>();
+
+  // Método para emitir el evento al cerrar el modal
+  cerrarModal() {
+    this.cerrar.emit(); // Emitir el evento al padre
+  }
 }

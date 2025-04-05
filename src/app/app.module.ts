@@ -35,6 +35,9 @@ import { DetalleVentasComponent } from './Menu/Ventas/ventas/detalle-ventas/deta
 import { ReciboVentasComponent } from './Menu/Ventas/ventas/recibo-ventas/recibo-ventas.component';
 import { CommonModule } from '@angular/common';
 import { OlvidarContrasenaComponent } from './components/olvidar-contrasena/olvidar-contrasena.component';
+import { RolesComponent } from './Menu/Administracion/Roles/roles/roles.component';
+import { RolesModalComponent } from './Menu/Administracion/Roles/roles-modal/roles-modal.component';
+import { PermisosModalComponent } from './Menu/Administracion/Roles/permisos-modal/permisos-modal.component';
 
 export function tokenGetter() {
   return localStorage.getItem('token');
@@ -63,7 +66,10 @@ export function tokenGetter() {
     PedidosModalComponent,
     DetalleVentasComponent,
     ReciboVentasComponent,
-    OlvidarContrasenaComponent
+    RolesComponent,
+    RolesModalComponent,
+    PermisosModalComponent,
+
   ],
   imports: [
     BrowserModule,
@@ -76,6 +82,7 @@ export function tokenGetter() {
     RouterModule,
     FormsModule,
     ReactiveFormsModule,
+    OlvidarContrasenaComponent,
     HttpClientModule,
     LoginComponent, // Importa LoginComponent como standalone
     DashboardComponent, // Importa DashboardComponent como standalone

@@ -25,6 +25,9 @@ import { ReporteInventarioComponent } from './Menu/Reportes/reporte-inventario/r
 import { ReportePedidosComponent } from './Menu/Reportes/reporte-pedidos/reporte-pedidos.component';
 import { ReporteUsuarioComponent } from './Menu/Reportes/reporte-usuario/reporte-usuario.component';
 import { ReporteVentaComponent } from './Menu/Reportes/reporte-venta/reporte-venta.component';
+import { RolesComponent } from './Menu/Administracion/Roles/roles/roles.component';
+import { RolesModalComponent } from './Menu/Administracion/Roles/roles-modal/roles-modal.component';
+import { OlvidarContrasenaComponent } from './components/olvidar-contrasena/olvidar-contrasena.component';
 import { AuthGuard } from './guards/auth.guard';
 
 const routes: Routes = [
@@ -33,33 +36,39 @@ const routes: Routes = [
   },
   { 
     path: 'login', component: LoginComponent,
+  
   },
+  {path: 'olvidaste', component:  OlvidarContrasenaComponent, },
   {
+    
     path: 'home', component: SidebarComponent, 
+    
     children: [
-      { path: '', component: DashboardComponent,  },
-      { path: 'caja/apertura-caja', component:  AperturaCajaComponent, },
-      { path: 'caja/cierre-caja', component: CierreCajaComponent, },
-      { path: 'articulos/productos', component: ProductosComponent, },
-      { path: 'articulos/productos-modal', component: ProductosModalComponent,  },
-      { path: 'articulos/proveedores', component: ProveedoresComponent,  },
-      { path: 'articulos/proveedores-modal', component: ProveedoresModalComponent,  },
-      { path: 'articulos/categoria', component: CategoriaComponent,   },
-      { path: 'inventario/pedidos', component: PedidosComponent,  },
-      { path: 'inventario/pedidos-modal', component: PedidosModalComponent,  },
-      { path: 'inventario/stock', component: StockComponent,  },
-      { path: 'ventas/venta', component: VentasComponent,  },
-      { path: 'ventas/detalle-venta', component: DetalleVentasComponent,  },
-      { path: 'ventas/recibo-venta', component: ReciboVentasComponent,  },
-      { path: 'ventas/historial', component: HistorialComponent,  },
-      { path: 'administracion/usuarios', component: UsuariosComponent,  },
-      { path: 'administracion/usuario-modal', component: UsuarioModalComponent,  },
-      { path: 'administracion/contacto', component: ContactoComponent,  },
-      { path: 'administracion/contacto-modal', component: ContactoModalComponent,  },
-      { path: 'reportes/usuarios', component: ReporteUsuarioComponent, },
-      { path: 'reportes/ventas', component: ReporteVentaComponent, },
-      { path: 'reportes/pedidos', component: ReportePedidosComponent,  },
-      { path: 'reportes/inventario', component: ReporteInventarioComponent, },
+      { path: '', component: DashboardComponent, canActivate: [AuthGuard] },
+      { path: 'caja/apertura-caja', component:  AperturaCajaComponent, canActivate: [AuthGuard]},
+      { path: 'caja/cierre-caja', component: CierreCajaComponent, canActivate: [AuthGuard]},
+      { path: 'articulos/productos', component: ProductosComponent, canActivate: [AuthGuard]},
+      { path: 'articulos/productos-modal', component: ProductosModalComponent, canActivate: [AuthGuard] },
+      { path: 'articulos/proveedores', component: ProveedoresComponent, canActivate: [AuthGuard] },
+      { path: 'articulos/proveedores-modal', component: ProveedoresModalComponent, canActivate: [AuthGuard] },
+      { path: 'articulos/categoria', component: CategoriaComponent, canActivate: [AuthGuard]  },
+      { path: 'inventario/pedidos', component: PedidosComponent,canActivate: [AuthGuard]  },
+      { path: 'inventario/pedidos-modal', component: PedidosModalComponent, canActivate: [AuthGuard] },
+      { path: 'inventario/stock', component: StockComponent, canActivate: [AuthGuard] },
+      { path: 'ventas/venta', component: VentasComponent, canActivate: [AuthGuard] },
+      { path: 'ventas/detalle-venta', component: DetalleVentasComponent, canActivate: [AuthGuard] },
+      { path: 'ventas/recibo-venta', component: ReciboVentasComponent, canActivate: [AuthGuard] },
+      { path: 'ventas/historial', component: HistorialComponent, canActivate: [AuthGuard] },
+      { path: 'administracion/usuarios', component: UsuariosComponent, canActivate: [AuthGuard] },
+      { path: 'administracion/usuario-modal', component: UsuarioModalComponent, canActivate: [AuthGuard] },
+      { path: 'administracion/contacto', component: ContactoComponent, canActivate: [AuthGuard]  },
+      { path: 'administracion/contacto-modal', component: ContactoModalComponent, canActivate: [AuthGuard] },
+      { path: 'administracion/roles', component: RolesComponent, canActivate: [AuthGuard] },
+      { path: 'administracion/roles-modal', component: RolesModalComponent, canActivate: [AuthGuard] },
+      { path: 'reportes/usuarios', component: ReporteUsuarioComponent, canActivate: [AuthGuard]},
+      { path: 'reportes/ventas', component: ReporteVentaComponent, canActivate: [AuthGuard]},
+      { path: 'reportes/pedidos', component: ReportePedidosComponent, canActivate: [AuthGuard] },
+      { path: 'reportes/inventario', component: ReporteInventarioComponent, canActivate: [AuthGuard] },
       // Otras rutas aquí
     ]
   },
