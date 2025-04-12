@@ -191,4 +191,10 @@ export class UsuarioService {
 
     return throwError(() => new Error(mensajeError));
   }
+
+  // Eliminar usuario (eliminación lógica)
+  eliminarUsuarioLogico(id: number): Observable<any> {
+    return this.http.put(`${this.apiUrl}/usuario/eliminar-logico/${id}`, {});
+  }
+
 }

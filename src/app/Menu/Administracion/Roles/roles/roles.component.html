@@ -1,10 +1,13 @@
-<div class="p-4 bg-gray-50 min-h-screen">
+<div class="p-4 ">
+    <div class="flex justify-between items-center mb-4">
+        <div></div>
+        <h2 class="text-2xl font-semibold">Gestión de Roles</h2>
+      </div>
     <!-- Header y Filtros -->
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
         <div class="flex items-center">
-            <h1 class="text-2xl font-bold text-gray-800">Gestión de Roles</h1>
             <button
-                class="bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded-md ml-4 transition-colors duration-200"
+                class="bg-[#070826] hover:bg-blue-900 text-white px-4 py-2 rounded-md ml-4 transition-colors duration-200"
                 (click)="abrirModalCrear()">
                 <i class="fas fa-plus mr-2"></i>
                 Nuevo Rol
@@ -99,7 +102,7 @@
                 <i class="fas fa-chevron-left"></i>
             </button>
 
-            <span class="px-4 py-2 bg-blue-700 text-white rounded-md">
+            <span class="px-4 py-2 bg-[#070826] text-white rounded-md">
                 {{ paginaActual }}
             </span>
 

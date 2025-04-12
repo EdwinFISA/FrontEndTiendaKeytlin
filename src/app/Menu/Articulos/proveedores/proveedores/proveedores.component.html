@@ -53,14 +53,19 @@
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ proveedor.telefono }}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ proveedor.estado }}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 flex space-x-2">
-              <button class="text-blue-500 hover:text-blue-700" (click)="abrirModal(proveedor, true)">
-                👁️
+              <button class="text-blue-600 hover:text-blue-800 transition-colors duration-200" 
+              (click)="abrirModal(proveedor, true)"
+              title="Ver detalles">
+              <i class="fas fa-eye"></i>
               </button>
-              <button class="text-green-500 hover:text-green-700" (click)="abrirModal(proveedor)">
-                ✏️
+              <button class="text-green-600 hover:text-green-800 transition-colors duration-200" (click)="abrirModal(proveedor)"
+              title="Editar">
+              <i class="fas fa-edit"></i>
               </button>
-              <button class="text-red-500 hover:text-red-700" (click)="eliminarProveedor(proveedor.id)">
-                ❌
+              <button class="text-red-600 hover:text-red-800 transition-colors duration-200" 
+              (click)="eliminarProveedor(proveedor.id)"
+              title="Eliminar">
+              <i class="fas fa-trash"></i>
               </button>
             </td>
           </tr>

@@ -66,20 +66,32 @@ export class ProveedoresComponent implements OnInit {
     this.modoVer = false;
   }
 
+  // Este método maneja tanto la creación como la actualización
   manejarProveedorGuardado(proveedor: Proveedor) {
     if (proveedor.id) {
       // Actualizar proveedor existente
-      const index = this.proveedores.findIndex(p => p.id === proveedor.id);
-      if (index !== -1) {
-        this.proveedores[index] = proveedor;
-      }
+      this.proveedorService.updateProveedor(proveedor.id, proveedor).subscribe({
+        next: (updatedProveedor) => {
+          const index = this.proveedores.findIndex(p => p.id === updatedProveedor.id);
+          if (index !== -1) {
+            this.proveedores[index] = updatedProveedor;
+          }
+          this.proveedoresFiltrados = [...this.proveedores];
+          this.cerrarModal();
+        },
+        error: (error) => console.error('Error al actualizar proveedor:', error)
+      });
     } else {
       // Agregar nuevo proveedor
-      proveedor.id = this.proveedores.length + 1;
-      this.proveedores.push(proveedor);
+      this.proveedorService.addProveedor(proveedor).subscribe({
+        next: (newProveedor) => {
+          this.proveedores.push(newProveedor);
+          this.proveedoresFiltrados = [...this.proveedores];
+          this.cerrarModal();
+        },
+        error: (error) => console.error('Error al agregar proveedor:', error)
+      });
     }
-    this.proveedoresFiltrados = [...this.proveedores];
-    this.cerrarModal();
   }
 
   eliminarProveedor(id: number | undefined) {

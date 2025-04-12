@@ -1,4 +1,3 @@
-// services/proveedor.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -9,9 +8,9 @@ export interface Proveedor {
   nombre: string;
   nombreContacto: string;
   telefono: string;
-  telefonoContacto?: string; // <- Cambia a minúscula
+  telefonoContacto?: string;
   correo?: string;
-  direccion?: string; // <- Cambia a minúscula
+  direccion?: string;
   estado: string;
   descripcion?: string;
 }

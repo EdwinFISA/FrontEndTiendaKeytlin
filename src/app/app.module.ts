@@ -38,6 +38,9 @@ import { OlvidarContrasenaComponent } from './components/olvidar-contrasena/olvi
 import { RolesComponent } from './Menu/Administracion/Roles/roles/roles.component';
 import { RolesModalComponent } from './Menu/Administracion/Roles/roles-modal/roles-modal.component';
 import { PermisosModalComponent } from './Menu/Administracion/Roles/permisos-modal/permisos-modal.component';
+import { AccessDeniedComponent } from './components/login/access-denied.component';
+import { HasPermissionDirective } from '../directives/has-permission.directive';
+import { PermisosGuard } from './guards/permisos.guard';
 
 export function tokenGetter() {
   return localStorage.getItem('token');
@@ -60,8 +63,6 @@ export function tokenGetter() {
     ReporteVentaComponent,
     ReportePedidosComponent,
     ReporteInventarioComponent,
-    CategoriaComponent,
-    CategoriaModalComponent,
     ProductosModalComponent,
     PedidosModalComponent,
     DetalleVentasComponent,
@@ -69,7 +70,8 @@ export function tokenGetter() {
     RolesComponent,
     RolesModalComponent,
     PermisosModalComponent,
-
+    AccessDeniedComponent,
+    HasPermissionDirective,
   ],
   imports: [
     BrowserModule,
@@ -83,6 +85,8 @@ export function tokenGetter() {
     FormsModule,
     ReactiveFormsModule,
     OlvidarContrasenaComponent,
+    CategoriaComponent,
+    CategoriaModalComponent,
     HttpClientModule,
     LoginComponent, // Importa LoginComponent como standalone
     DashboardComponent, // Importa DashboardComponent como standalone
@@ -95,7 +99,8 @@ export function tokenGetter() {
     })
   ],
   providers: [
-    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true }
+    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
+    PermisosGuard 
   ],
   bootstrap: [AppComponent]
 })

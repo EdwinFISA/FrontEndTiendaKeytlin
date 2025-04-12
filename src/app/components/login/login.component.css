@@ -8,7 +8,7 @@
 }
 
 
-/* Añade esto a tu archivo de estilos (styles.css o el archivo de componente) */
+/* Para quitar ojo automatico del navegdor  */
 .no-native-eye-icon::-ms-reveal,
 .no-native-eye-icon::-ms-clear,
 .no-native-eye-icon::-webkit-contacts-auto-fill-button,

@@ -1,32 +1,33 @@
 <div class="fixed inset-0 flex items-center justify-center z-50" style="background-color: rgba(0, 0, 0, 0.50);">
   <div class="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full">
-    <!-- Título alineado a la izquierda -->
-    <h2 class="text-2xl font-bold mb-4 border-b pb-2 text-left">Agregar categoría</h2>
+    <h2 class="text-2xl font-bold mb-4 border-b pb-2 text-left">
+      Agregar categoría
+    </h2>
 
-    <!-- Formulario -->
     <div class="grid grid-cols-2 gap-4">
-      <!-- Nombre de categoría -->
       <div>
         <label class="block font-semibold mb-1">Nombre categoría*</label>
         <input type="text"
+               [(ngModel)]="nombreCategoria"
                class="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                placeholder="Ejemplo: Golosinas" />
       </div>
 
-      <!-- Descripción -->
       <div>
         <label class="block font-semibold mb-1">Descripción</label>
-        <textarea class="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        <textarea [(ngModel)]="descripcion"
+                  class="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Ejemplo: Bolsa de golosinas"></textarea>
       </div>
     </div>
 
-    <!-- Botones alineados a la izquierda -->
     <div class="mt-4 flex justify-start gap-2">
-      <button class="bg-gray-900 text-white px-4 py-2 rounded-md hover:bg-gray-700">
+      <button (click)="guardarCategoria()"
+              class="bg-gray-900 text-white px-4 py-2 rounded-md hover:bg-gray-700">
         Guardar
       </button>
-      <button class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-500">
+      <button (click)="cancelar()"
+              class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-500">
         Cancelar
       </button>
     </div>

@@ -29,6 +29,7 @@ import { RolesComponent } from './Menu/Administracion/Roles/roles/roles.componen
 import { RolesModalComponent } from './Menu/Administracion/Roles/roles-modal/roles-modal.component';
 import { OlvidarContrasenaComponent } from './components/olvidar-contrasena/olvidar-contrasena.component';
 import { AuthGuard } from './guards/auth.guard';
+import { AccessDeniedComponent } from './components/login/access-denied.component';
 
 const routes: Routes = [
   {
@@ -38,7 +39,9 @@ const routes: Routes = [
     path: 'login', component: LoginComponent,
   
   },
-  {path: 'olvidaste', component:  OlvidarContrasenaComponent, },
+  {
+    path: 'access-denied', component: AccessDeniedComponent,
+  },
   {
     
     path: 'home', component: SidebarComponent, 

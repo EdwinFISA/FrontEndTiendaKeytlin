@@ -1,6 +1,6 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, NgForm} from '@angular/forms';
 import { Proveedor } from '../../../../services/proveedor.service';
 
 @Component({
@@ -15,18 +15,22 @@ export class ProveedoresModalComponent {
   @Input() modoVer: boolean = false;
   @Output() cerrarModal = new EventEmitter<void>();
   @Output() guardarProveedor = new EventEmitter<Proveedor>();
+  @Output() actualizarProveedor = new EventEmitter<{ id: number, proveedor: Proveedor }>();
+  @Output() eliminarProveedor = new EventEmitter<number>();
+  @ViewChild('proveedor') proveedorForm1!: NgForm;
 
   proveedorForm: Proveedor = {
     nombre: '',
     nombreContacto: '',
     telefono: '',
-    telefonoContacto: '', // <- Corrige aquí
+    telefonoContacto: '',
     correo: '',
-    direccion: '', // <- Corrige aquí
+    direccion: '',
     estado: 'Activo',
-    descripcion: '' // <- Corrige aquí
+    descripcion: ''
   };
 
+  cargando = false;
 
   ngOnInit() {
     if (this.proveedor) {
@@ -40,7 +44,19 @@ export class ProveedoresModalComponent {
         alert('Los campos marcados con * son obligatorios');
         return;
       }
-      this.guardarProveedor.emit(this.proveedorForm);
+      if (this.proveedor && this.proveedor.id) {
+        // Si existe un proveedor con ID, actualizar
+        this.actualizarProveedor.emit({ id: this.proveedor.id, proveedor: this.proveedorForm });
+      } else {
+        // Si no existe ID, guardar como nuevo proveedor
+        this.guardarProveedor.emit(this.proveedorForm);
+      }
+    }
+  }
+
+  eliminar() {
+    if (this.proveedor && this.proveedor.id && confirm('¿Estás seguro de eliminar este proveedor?')) {
+      this.eliminarProveedor.emit(this.proveedor.id);
     }
   }
 }

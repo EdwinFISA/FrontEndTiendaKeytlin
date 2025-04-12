@@ -1,99 +1,206 @@
-  <div class="fixed inset-0 flex items-center justify-center z-50" style="background-color: rgba(0, 0, 0, 0.50);">
-    <div class="bg-white p-6 rounded-md w-[800px]">
-      <!-- Aumenté el ancho para acomodar 3 columnas -->
-      <h2 class="text-xl font-semibold mb-4">
-        {{ modoVer ? 'Ver' : (proveedor ? 'Editar' : 'Agregar') }} Proveedor
-      </h2>
+<div class="fixed inset-0 flex items-center justify-center z-50" style="background-color: rgba(0, 0, 0, 0.50);">
+  <div class="bg-white p-6 rounded-md w-[800px]">
 
-      <!-- Primera fila -->
-      <div class="grid grid-cols-3 gap-4 mb-4">
-        <!-- Nombre empresa -->
-        <div>
-          <label class="block text-left">Nombre de la empresa *</label>
-          <input type="text" [(ngModel)]="proveedorForm.nombre"
-                 [readonly]="modoVer"
-                 class="border p-2 w-full rounded-md" />
-        </div>
+    
+    <h2 class="text-2xl font-bold mb-4 border-b pb-2 text-left">
+      {{ modoVer ? 'Ver' : (proveedor ? 'Editar' : 'Agregar') }} Proveedor
+    </h2>
 
-        <!-- Nombre contacto -->
-        <div>
-          <label class="block text-left">Nombre del contacto *</label>
-          <input type="text" [(ngModel)]="proveedorForm.nombreContacto"
-                 [readonly]="modoVer"
-                 class="border p-2 w-full rounded-md" />
-        </div>
-
-        <!-- Número empresa -->
-        <div>
-          <label class="block text-left">Número de la empresa *</label>
-          <input type="text" [(ngModel)]="proveedorForm.telefono"
-                 [readonly]="modoVer"
-                 class="border p-2 w-full rounded-md" />
-        </div>
-      </div>
-
-      <!-- Segunda fila -->
-      <div class="grid grid-cols-3 gap-4 mb-4">
-        <!-- Número contacto -->
-        <div>
-          <label class="block text-left">Número del contacto</label>
-          <input type="text" [(ngModel)]="proveedorForm.telefonoContacto"
-                 [readonly]="modoVer"
-                 class="border p-2 w-full rounded-md" />
-        </div>
-
-        <!-- Dirección -->
-        <div>
-          <label class="block text-left">Dirección de la empresa *</label>
-          <input type="text" [(ngModel)]="proveedorForm.direccion"
-                 [readonly]="modoVer"
-                 class="border p-2 w-full rounded-md" />
-        </div>
-
-        <!-- Email -->
-        <div>
-          <label class="block text-left">Email de la empresa</label>
-          <input type="email" [(ngModel)]="proveedorForm.correo"
-                 [readonly]="modoVer"
-                 class="border p-2 w-full rounded-md" />
+    <!-- Fila 1 -->
+    <div class="grid grid-cols-3 gap-4 mb-4">
+      <!-- Nombre empresa -->
+      <div>
+        <label for="nombreEmpresa" class="block text-sm font-medium mb-1 text-left" style="color: #670305;">
+          Nombre de la empresa <span style="color: #670305;">*</span>
+        </label>
+        <input
+          type="text"
+          id="nombreEmpresa"
+          name="nombreEmpresa"
+          maxlength="50"
+          pattern="^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$"
+          [(ngModel)]="proveedorForm.nombre"
+          #nombreEmpresa="ngModel"
+          required
+          [readonly]="modoVer"
+          [class.bg-gray-100]="modoVer"
+          class="rounded w-full py-2 px-3 focus:outline-none focus:ring-1"
+          style="border: 1px solid #070826; color: #670305;"
+        />
+        <div *ngIf="nombreEmpresa.invalid && (nombreEmpresa.dirty || nombreEmpresa.touched)" class="text-red-500 text-sm mt-1">
+          <div *ngIf="nombreEmpresa.errors?.['required']">El nombre es obligatorio.</div>
+          <div *ngIf="nombreEmpresa.errors?.['maxlength']">No debe exceder los 50 caracteres.</div>
+          <div *ngIf="nombreEmpresa.errors?.['pattern']">Solo se permiten letras y espacios.</div>
         </div>
       </div>
 
-      <!-- Tercera fila -->
-      <div class="grid grid-cols-3 gap-4 mb-4">
-        <!-- Estado -->
-        <div>
-          <label class="block text-left">Estado *</label>
-          <select [(ngModel)]="proveedorForm.estado"
-                  [disabled]="modoVer"
-                  class="border p-2 w-full rounded-md">
-            <option value="Activo">Activo</option>
-            <option value="Inactivo">Inactivo</option>
-          </select>
-        </div>
-
-        <!-- Descripción -->
-        <div class="col-span-2">
-          <label class="block text-left">Descripción</label>
-          <textarea [(ngModel)]="proveedorForm.descripcion"
-                    [readonly]="modoVer"
-                    rows="3"
-                    class="border p-2 w-full rounded-md"></textarea>
+      <!-- Nombre contacto -->
+      <div>
+        <label for="nombreContacto" class="block text-sm font-medium mb-1 text-left" style="color: #670305;">
+          Nombre del contacto <span style="color: #670305;">*</span>
+        </label>
+        <input
+          type="text"
+          id="nombreContacto"
+          name="nombreContacto"
+          maxlength="50"
+          pattern="^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$"
+          [(ngModel)]="proveedorForm.nombreContacto"
+          #nombreContacto="ngModel"
+          required
+          [readonly]="modoVer"
+          [class.bg-gray-100]="modoVer"
+          class="rounded w-full py-2 px-3 focus:outline-none focus:ring-1"
+          style="border: 1px solid #070826; color: #670305;"
+        />
+        <div *ngIf="nombreContacto.invalid && (nombreContacto.dirty || nombreContacto.touched)" class="text-red-500 text-sm mt-1">
+          <div *ngIf="nombreContacto.errors?.['required']">El nombre es obligatorio.</div>
+          <div *ngIf="nombreContacto.errors?.['maxlength']">No debe exceder los 50 caracteres.</div>
+          <div *ngIf="nombreContacto.errors?.['pattern']">Solo se permiten letras y espacios.</div>
         </div>
       </div>
 
-      <!-- Botones alineados a la izquierda -->
-      <div class="flex justify-start gap-2 mt-4">
-        <button (click)="cerrarModal.emit()"
-                class="bg-[#B40001] text-white px-4 py-2 rounded-md">
-          {{ modoVer ? 'Cerrar' : 'Cancelar' }}
-        </button>
-        <button *ngIf="!modoVer"
-                (click)="guardar()"
-                class="bg-[#070826] text-white px-4 py-2 rounded-md">
-          Guardar
-        </button>
+      <!-- Número empresa -->
+      <div>
+        <label for="telefono" class="block text-sm font-medium mb-1 text-left" style="color: #670305;">
+          Número de la empresa <span style="color: #670305;">*</span>
+        </label>
+        <input
+          type="text"
+          id="telefono"
+          name="telefono"
+          maxlength="9"
+          pattern="^\d{4}\s\d{4}$"
+          [(ngModel)]="proveedorForm.telefono"
+          #telefono="ngModel"
+          required
+          [readonly]="modoVer"
+          [class.bg-gray-100]="modoVer"
+          class="rounded w-full py-2 px-3 focus:outline-none focus:ring-1"
+          style="border: 1px solid #070826; color: #670305;"
+        />
+        <div *ngIf="telefono.invalid && (telefono.dirty || telefono.touched)" class="text-red-500 text-sm mt-1">
+          <div *ngIf="telefono.errors?.['required']">El número es obligatorio.</div>
+          <div *ngIf="telefono.errors?.['pattern']">Debe tener el formato 0000 0000.</div>
+        </div>
       </div>
     </div>
-  </div>
 
+    <!-- Fila 2 -->
+    <div class="grid grid-cols-3 gap-4 mb-4">
+      <!-- Número contacto -->
+      <div>
+        <label for="telefonoContacto" class="block text-sm font-medium mb-1 text-left" style="color: #670305;">
+          Número del contacto <span style="color: #670305;">*</span>
+        </label>
+        <input
+          type="text"
+          id="telefonoContacto"
+          name="telefonoContacto"
+          maxlength="9"
+          pattern="^\d{4}\s\d{4}$"
+          [(ngModel)]="proveedorForm.telefonoContacto"
+          #telefonoContacto="ngModel"
+          required
+          [readonly]="modoVer"
+          [class.bg-gray-100]="modoVer"
+          class="rounded w-full py-2 px-3 focus:outline-none focus:ring-1"
+          style="border: 1px solid #070826; color: #670305;"
+        />
+        <div *ngIf="telefonoContacto.invalid && (telefonoContacto.dirty || telefonoContacto.touched)" class="text-red-500 text-sm mt-1">
+          <div *ngIf="telefonoContacto.errors?.['required']">El número es obligatorio.</div>
+          <div *ngIf="telefonoContacto.errors?.['pattern']">Debe tener el formato 0000 0000.</div>
+        </div>
+      </div>
+
+      <!-- Dirección -->
+      <div>
+        <label for="direccion" class="block text-sm font-medium mb-1 text-left" style="color: #670305;">
+          Dirección de la empresa <span style="color: #670305;">*</span>
+        </label>
+        <input
+          type="text"
+          id="direccion"
+          name="direccion"
+          maxlength="500"
+          [(ngModel)]="proveedorForm.direccion"
+          #direccion="ngModel"
+          required
+          [readonly]="modoVer"
+          [class.bg-gray-100]="modoVer"
+          class="rounded w-full py-2 px-3 focus:outline-none focus:ring-1"
+          style="border: 1px solid #070826; color: #670305;"
+        />
+        <div *ngIf="direccion.invalid && (direccion.dirty || direccion.touched)" class="text-red-500 text-sm mt-1">
+          <div *ngIf="direccion.errors?.['required']">La dirección es obligatoria.</div>
+          <div *ngIf="direccion.errors?.['maxlength']">No debe exceder los 500 caracteres.</div>
+        </div>
+      </div>
+
+      <!-- Email -->
+      <div>
+        <label for="correo" class="block text-sm font-medium mb-1 text-left" style="color: #670305;">
+          Email de la empresa
+        </label>
+        <input
+          type="email"
+          id="correo"
+          name="correo"
+          maxlength="100"
+          [(ngModel)]="proveedorForm.correo"
+          #correo="ngModel"
+          [readonly]="modoVer"
+          [class.bg-gray-100]="modoVer"
+          class="rounded w-full py-2 px-3 focus:outline-none focus:ring-1"
+          style="border: 1px solid #070826; color: #670305;"
+        />
+        <div *ngIf="correo.invalid && (correo.dirty || correo.touched)" class="text-red-500 text-sm mt-1">
+          <div *ngIf="correo.errors?.['email']">Debe ser un correo válido.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fila 3 -->
+    <div class="grid grid-cols-3 gap-4 mb-4">
+      <!-- Estado -->
+      <div>
+        <label class="block text-sm font-medium mb-1 text-left" style="color: #670305;">Estado <span style="color: #670305;">*</span></label>
+        <select [(ngModel)]="proveedorForm.estado"
+                #estado="ngModel"
+                required
+                [disabled]="modoVer"
+                [class.bg-gray-100]="modoVer"
+                class="rounded w-full py-2 px-3 focus:outline-none focus:ring-1"
+                style="border: 1px solid #070826; color: #670305;">
+          <option value="" disabled selected>Seleccione</option>
+          <option value="Activo">Activo</option>
+          <option value="Inactivo">Inactivo</option>
+        </select>
+        <div *ngIf="estado.invalid && (estado.dirty || estado.touched)" class="text-red-500 text-sm mt-1">
+          <div *ngIf="estado.errors?.['required']">El estado es obligatorio.</div>
+        </div>
+      </div>
+
+      <!-- Descripción -->
+      <div class="col-span-2">
+        <label class="block text-sm font-medium mb-1 text-left" style="color: #670305;">Descripción</label>
+        <textarea [(ngModel)]="proveedorForm.descripcion"
+                  [readonly]="modoVer"
+                  rows="3"
+                  [class.bg-gray-100]="modoVer"
+                  class="rounded w-full py-2 px-3 focus:outline-none focus:ring-1"
+                  style="border: 1px solid #070826; color: #670305;"></textarea>
+      </div>
+    </div>
+
+    <!-- Botones -->
+    <div class="flex justify-start gap-2 mt-4">
+      <button (click)="cerrarModal.emit()" class="bg-[#B40001] text-white px-4 py-2 rounded-md">
+        {{ modoVer ? 'Cerrar' : 'Cancelar' }}
+      </button>
+      <button *ngIf="!modoVer" (click)="guardar()" [disabled]="!proveedorForm.nombre || cargando" class="bg-[#070826] text-white px-4 py-2 rounded-md disabled:cursor-not-allowed">
+        Guardar
+      </button>
+    </div>
+  </div>
+</div>

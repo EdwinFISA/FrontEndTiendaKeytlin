@@ -209,7 +209,7 @@ export class UsuariosComponent implements OnInit {
           Swal.fire({
             icon: 'success',
             title: 'Usuario creado',
-            text: `Contraseña generada: ${response.contrasenaGenerada}`
+            text: `Contraseña generada: Revise su Correo Electronico`
           });
         } else {
           Swal.fire({
@@ -249,6 +249,40 @@ export class UsuariosComponent implements OnInit {
         this.usuarioService.eliminarUsuario(id).subscribe({
           next: () => {
             this.cargarUsuarios();
+            Swal.fire({
+              icon: 'success',
+              title: 'Usuario eliminado',
+              text: 'El usuario ha sido eliminado con éxito.'
+            });
+          },
+          error: (error) => {
+            console.error('Error al eliminar usuario:', error);
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'Hubo un problema al eliminar el usuario.'
+            });
+          }
+        });
+      }
+    });
+  }
+
+  //ELIMINACIÖN LOGICA
+  eliminarUsuarioLogico(id: number) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Confirmar eliminación',
+      text: '¿Está seguro de eliminar este usuario?',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Llamar al servicio con el ID para eliminar lógicamente
+        this.usuarioService.eliminarUsuarioLogico(id).subscribe({
+          next: () => {
+            this.cargarUsuarios();  // Recargar la lista de usuarios
             Swal.fire({
               icon: 'success',
               title: 'Usuario eliminado',
