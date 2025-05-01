@@ -146,7 +146,7 @@ export class UsuarioService {
   }
 
   // Subir imagen
-  subirImagen(archivo: File): Observable<any> {
+ /* subirImagen(archivo: File): Observable<any> {
     const formData = new FormData();
     formData.append('archivo', archivo);
     return this.http.post(`${this.apiUrl}/subir-imagen`, formData, {
@@ -155,7 +155,15 @@ export class UsuarioService {
     }).pipe(
       catchError(this.handleError)
     );
+  }*/
+
+
+  subirImagen(archivo: File): Observable<string> {
+    const formData = new FormData();
+    formData.append('archivo', archivo);
+    return this.http.post<string>('https://localhost:56232/api/usuarios/subir-imagen', formData);
   }
+  
 
   // Eliminar usuario
   eliminarUsuario(id: number): Observable<any> {

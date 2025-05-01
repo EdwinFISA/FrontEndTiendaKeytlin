@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { UsuarioService } from '../../../../services/usuario.service';
 import Swal from 'sweetalert2';
 import { FormsModule } from '@angular/forms';
@@ -18,6 +18,7 @@ export class UsuariosComponent implements OnInit {
   mostrarModal = false;
   usuarioSeleccionado: any = null;
   modoVista: boolean = false;
+  @ViewChild(UsuarioModalComponent) usuarioModalComponent!: UsuarioModalComponent;
 
   // Filtros
   filtroUsuario = '';
@@ -108,6 +109,7 @@ export class UsuariosComponent implements OnInit {
 
 
   usuariosPaginados(): any[] {
+    console.log(this.usuarios)
     return this.usuarios.slice(
       (this.paginaActual - 1) * this.elementosPorPagina,
       this.paginaActual * this.elementosPorPagina
@@ -143,6 +145,7 @@ export class UsuariosComponent implements OnInit {
       Apellido: '',
       Correo: '',
       Telefono: '',
+      FechaNacimiento: '',
       Imagen: '',
       EstadoId: '',
       RolId: '',
@@ -158,15 +161,32 @@ export class UsuariosComponent implements OnInit {
       Nombre: usuario.nombre || usuario.Nombre,
       Apellido: usuario.apellido || usuario.Apellido,
       Correo: usuario.correo || usuario.Correo,
+      FechaNacimiento: usuario.fechaNacimiento || usuario.FechaNacimiento,
       Telefono: usuario.telefono || usuario.Telefono,
       Imagen: usuario.imagen || usuario.Imagen,
       EstadoId: usuario.estadoId || usuario.EstadoId,
       RolId: usuario.rolId || usuario.RolId
     };
-
+    
+   // this.usuarioModalComponent.imagenPrevia = this.usuarioService.getImagenUrl(this.usuarioSeleccionado.Imagen!);
     console.log('Usuario para editar:', this.usuarioSeleccionado);
     this.mostrarModal = true;
     this.modoVista = false;
+
+    setTimeout(() => {
+      if (this.usuarioSeleccionado.Imagen) {
+        const imagen = this.usuarioSeleccionado.Imagen;
+    
+        if (imagen.startsWith('data:image')) {
+          // Es base64, asignar directamente
+          this.usuarioModalComponent.imagenPrevia = imagen;
+        } else {
+          // Es nombre de imagen, usar método para obtener la URL del backend
+          this.usuarioModalComponent.imagenPrevia = this.usuarioService.getImagenUrl(imagen);
+        }
+      }
+    });
+    
   }
 
   verUsuario(usuario: any) {
@@ -178,7 +198,8 @@ export class UsuariosComponent implements OnInit {
       Telefono: usuario.telefono || usuario.Telefono,
       Imagen: usuario.imagen || usuario.Imagen,
       EstadoId: usuario.estadoId || usuario.EstadoId,
-      RolId: usuario.rolId || usuario.RolId
+      RolId: usuario.rolId || usuario.RolId,
+      FechaNacimiento: usuario.fechaNacimiento || usuario.FechaNacimiento,
     };
     this.modoVista = true;
     this.mostrarModal = true; // Asegúrate de que este modal solo muestre información
@@ -193,7 +214,8 @@ export class UsuariosComponent implements OnInit {
       Nombre: usuario.Nombre,
       Apellido: usuario.Apellido,
       Correo: usuario.Correo,
-      Telefono: usuario.Telefono
+      Telefono: usuario.Telefono,
+      FechaNacimiento: usuario.FechaNacimiento 
     };
 
     console.log('Datos preparados para enviar:', JSON.stringify(usuarioParaGuardar, null, 2));

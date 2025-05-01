@@ -98,7 +98,10 @@
     <!-- Contenedor para icono de usuario y flecha -->
     <div class="flex items-center cursor-pointer" (click)="toggleDropdown('usuario')">
       <!-- Icono de usuario -->
-      <i class="fas fa-user-circle mr-2 text-xl"></i>
+      <img [src]="currentUser.imagen "
+      (error)="currentUser.imagen = currentUser"
+      class="h-6 w-6 rounded-full object-cover border mr-2"
+      [alt]="'Foto de ' + currentUser.nombre">
 
       <!-- Información del usuario -->
       <div class="text-right mr-4">

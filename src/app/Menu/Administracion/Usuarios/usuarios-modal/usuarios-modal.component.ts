@@ -12,7 +12,7 @@ interface Usuario {
   Apellido?: string;
   Correo?: string;
   Telefono?: string;
-  FechaNacimiento?: '',
+  FechaNacimiento?: 'Date',
   Imagen?: string;
   EstadoId?: number;
   RolId?: number;
@@ -47,7 +47,7 @@ export class UsuarioModalComponent implements OnInit {
   roles: any[] = [];
   estados: any[] = [];
   imagenPrevia: string | ArrayBuffer | null = null;
-  archivoImagen: File | null = null;
+  archivoImagen!: File;
   cargando = false;
 
   constructor(
@@ -124,6 +124,7 @@ export class UsuarioModalComponent implements OnInit {
     };
     reader.readAsDataURL(file);
   }
+  
 
   onFileInputClick(): void {
     this.document.getElementById('fileInput')?.click();
@@ -132,6 +133,23 @@ export class UsuarioModalComponent implements OnInit {
   getImagenUrl(nombreImagen: string): string {
     return this.usuarioService.getImagenUrl(nombreImagen);
   }
+
+  convertirArchivoABase64(file: File): Promise<string | ArrayBuffer | null> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+  
+      reader.onload = () => {
+        resolve(reader.result); // contiene la imagen como base64
+      };
+  
+      reader.onerror = error => {
+        reject(error);
+      };
+  
+      reader.readAsDataURL(file);
+    });
+  }
+  
 
   async onSubmit(): Promise<void> {
     if (this.cargando) return;
@@ -142,16 +160,15 @@ export class UsuarioModalComponent implements OnInit {
     }
 
     this.cargando = true;
-
+    console.log(this.usuarioForm.value)
     try {
-      if (this.archivoImagen) {
-        const nombreImagen = await this.usuarioService.subirImagen(this.archivoImagen).toPromise();
-        this.usuario.Imagen = nombreImagen;
-      }
-
+      let imagen = this.archivoImagen 
+      const base64 = await this.convertirArchivoABase64(imagen);
+        console.log(base64)
       const usuarioCompleto: Usuario = {
         ...this.usuario,
         Estado: this.estados.find(e => e.Id === this.usuario.EstadoId),
+        Imagen: base64?.toString(),
         Rol: this.roles.find(r => r.Id === this.usuario.RolId)
       };
 
