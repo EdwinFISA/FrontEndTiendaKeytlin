@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { EmpresaService, Empresa } from '../../../../services/empresa.service';
+import { AuthService } from '../../../../services/auth.service';
 
 @Component({
   selector: 'app-contacto',
@@ -17,10 +18,19 @@ export class ContactoComponent implements OnInit {
     direccion: ''
   };
 
-  constructor(private empresaService: EmpresaService) { }
+   //Variables de Permisos
+  puedeCrear: boolean = false;
+  puedeEditar: boolean = false;
+  puedeEliminar: boolean = false;
+  puedeVer: boolean = false;
+
+  constructor(private empresaService: EmpresaService,
+    private authService: AuthService
+  ) { }
 
   ngOnInit(): void {
     this.obtenerEmpresa();
+    this.cargarPermisos();
   }
 
   obtenerEmpresa() {
@@ -32,6 +42,15 @@ export class ContactoComponent implements OnInit {
         console.error('Error al obtener la empresa:', error);
       }
     );
+  }
+
+  cargarPermisos() {
+    const permisos = this.authService.obtenerPermisos(); // o donde guardes los permisos del usuario
+  
+    this.puedeCrear = permisos.includes('Crear Contacto');
+    this.puedeEditar = permisos.includes('Editar Contacto');
+    this.puedeEliminar = permisos.includes('Eliminar Contacto');
+    this.puedeVer = permisos.includes('Ver Contacto');
   }
 
   openModal() {

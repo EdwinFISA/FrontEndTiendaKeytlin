@@ -3,15 +3,8 @@ import Swal from 'sweetalert2';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { CategoriaModalComponent } from '../categoria-modal/categoria-modal.component';
-import { CategoriaService } from '../../../../services/categoria.service';
-
-interface Categoria {
-  Id?: number;
-  Nombre?: string;
-  Descripcion?: string;
-  Estado?: string;
-  fechaCreacion?: string;
-}
+import { CategoriaService, Categoria, EstadoUsuario } from '../../../../services/categoria.service';
+import { AuthService } from '../../../../services/auth.service';
 
 @Component({
   selector: 'app-categoria',
@@ -23,11 +16,11 @@ interface Categoria {
 export class CategoriaComponent implements OnInit {
   categorias: Categoria[] = [];
   originalCategorias: Categoria[] = [];
-  mostrarModal: boolean  = false;
+  estados: EstadoUsuario[] = [];
+  mostrarModal: boolean = false;
   categoriaSeleccionada: Categoria | null = null;
   modoVista: boolean = false;
   modoEdicion: boolean = false;
- // modoVista: 'crear' | 'editar' = 'crear';
 
   // Filtros
   filtroCategoria = '';
@@ -38,10 +31,21 @@ export class CategoriaComponent implements OnInit {
   paginaActual = 1;
   elementosPorPagina = 10;
 
-  constructor(private categoriaService: CategoriaService) { }
+  // Variables de Permisos
+  puedeCrear: boolean = false;
+  puedeEditar: boolean = false;
+  puedeEliminar: boolean = false;
+  puedeVer: boolean = false;
+
+  constructor(
+    private categoriaService: CategoriaService,
+    private authService: AuthService
+  ) { }
 
   ngOnInit(): void {
     this.cargarCategorias();
+    this.cargarEstados();
+    this.cargarPermisos();
   }
 
   cargarCategorias() {
@@ -60,6 +64,26 @@ export class CategoriaComponent implements OnInit {
     });
   }
 
+  cargarEstados() {
+    this.categoriaService.obtenerEstados().subscribe({
+      next: (data) => {
+        this.estados = data;
+      },
+      error: (error) => {
+        console.error('Error al cargar estados:', error);
+      }
+    });
+  }
+
+  cargarPermisos() {
+    const permisos = this.authService.obtenerPermisos(); // o donde guardes los permisos del usuario
+  
+    this.puedeCrear = permisos.includes('Crear Categorías');
+    this.puedeEditar = permisos.includes('Editar Categorías');
+    this.puedeEliminar = permisos.includes('Eliminar Categorías');
+    this.puedeVer = permisos.includes('Ver Categorías');
+  }
+
   buscarCategoria() {
     if (!this.filtroCategoria.trim()) {
       this.categorias = [...this.originalCategorias];
@@ -68,8 +92,8 @@ export class CategoriaComponent implements OnInit {
 
     const filtro = this.filtroCategoria.toLowerCase();
     this.categorias = this.originalCategorias.filter(categoria =>
-      categoria.Nombre?.toLowerCase().includes(filtro) ||
-      categoria.Descripcion?.toLowerCase().includes(filtro)
+      categoria.categoriaNombre?.toLowerCase().includes(filtro) ||
+      categoria.descripcion?.toLowerCase().includes(filtro)
     );
   }
 
@@ -125,42 +149,43 @@ export class CategoriaComponent implements OnInit {
   }
 
   abrirModalCrear() {
+    // Buscar el estado "Activo" por defecto
+    const estadoActivo = this.estados.find(e => e.nombre === 'Activo');
+    
     this.categoriaSeleccionada = {
-      Id: 0,
-      Nombre: '',
-      Descripcion: '',
-      Estado: 'Activo'
+      id: 0,
+      categoriaNombre: '',
+      descripcion: '',
+      estadoUsuarioId: estadoActivo?.id || 1
     };
     this.mostrarModal = true;
     this.modoVista = false;
+    this.modoEdicion = false;
   }
 
   abrirModalEditar(categoria: Categoria) {
     this.categoriaSeleccionada = { ...categoria };
     this.mostrarModal = true;
     this.modoVista = false;
+    this.modoEdicion = true;
   }
 
   verCategoria(categoria: Categoria) {
     this.categoriaSeleccionada = { ...categoria };
     this.modoVista = true;
     this.mostrarModal = true;
+    this.modoEdicion = false;
   }
 
   guardarCategoria(categoria: Categoria) {
-    const nuevaCategoria = {
-      ...categoria,
-      Id: this.categoriaSeleccionada?.Id || 0
-    };
-
-    this.categoriaService.guardarCategoria(nuevaCategoria).subscribe({
+    this.categoriaService.guardarCategoria(categoria).subscribe({
       next: () => {
         this.cargarCategorias();
         this.cerrarModal();
         Swal.fire({
           icon: 'success',
-          title: nuevaCategoria.Id ? 'Categoría actualizada' : 'Categoría creada',
-          text: nuevaCategoria.Id ? 'Se actualizó correctamente.' : 'Se creó correctamente.'
+          title: categoria.id ? 'Categoría actualizada' : 'Categoría creada',
+          text: categoria.id ? 'Se actualizó correctamente.' : 'Se creó correctamente.'
         });
       },
       error: (error) => {
@@ -175,10 +200,12 @@ export class CategoriaComponent implements OnInit {
 
   eliminarCategoria(id: number) {
     Swal.fire({
+      title: '¿Está seguro?',
+      text: "Esta acción no se puede deshacer",
       icon: 'warning',
-      title: 'Confirmar eliminación',
-      text: '¿Está seguro de eliminar esta categoría?',
       showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
       confirmButtonText: 'Sí, eliminar',
       cancelButtonText: 'Cancelar'
     }).then((result) => {
@@ -186,17 +213,17 @@ export class CategoriaComponent implements OnInit {
         this.categoriaService.eliminarCategoria(id).subscribe({
           next: () => {
             this.cargarCategorias();
-            Swal.fire({
-              icon: 'success',
-              title: 'Categoría eliminada',
-              text: 'La categoría ha sido eliminada con éxito.'
-            });
+            Swal.fire(
+              '¡Eliminado!',
+              'La categoría ha sido eliminada.',
+              'success'
+            );
           },
           error: (error) => {
             Swal.fire({
               icon: 'error',
               title: 'Error',
-              text: 'Hubo un problema al eliminar la categoría.'
+              text: error.message || 'Error al eliminar categoría.'
             });
           }
         });

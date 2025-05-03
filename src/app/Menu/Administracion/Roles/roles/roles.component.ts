@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { RolUsuarioService } from '../../../../services/roles.service';
 import { ChangeDetectorRef } from '@angular/core';
+import { AuthService } from '../../../../services/auth.service';
+
 import Swal from 'sweetalert2';  // Importa SweetAlert2
 
 @Component({
@@ -21,14 +23,22 @@ export class RolesComponent implements OnInit {
   usuariosPorRol: { [key: number]: any[] } = {};  // Para almacenar los usuarios por rol
   permisosPorRol: { [key: number]: any[] } = {};  // Para almacenar los permisos por rol
 
+   //Variables de Permisos
+  puedeCrear: boolean = false;
+  puedeEditar: boolean = false;
+  puedeEliminar: boolean = false;
+  puedeVer: boolean = false;
+
 
   constructor(
     private rolService: RolUsuarioService,
-    private cdRef: ChangeDetectorRef
+    private cdRef: ChangeDetectorRef,
+    private authService: AuthService
   ) { }
 
   ngOnInit(): void {
     this.cargarRoles();
+    this.cargarPermisos();
   }
 
   cargarRoles(): void {
@@ -52,6 +62,14 @@ export class RolesComponent implements OnInit {
     });
   }
 
+  cargarPermisos() {
+    const permisos = this.authService.obtenerPermisos(); // o donde guardes los permisos del usuario
+  
+    this.puedeCrear = permisos.includes('Crear Roles');
+    this.puedeEditar = permisos.includes('Editar Roles');
+    this.puedeEliminar = permisos.includes('Eliminar Roles');
+    this.puedeVer = permisos.includes('Ver Roles');
+  }
 
   
   cargarUsuariosYPermisos(rol: any): void {

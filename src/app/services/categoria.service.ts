@@ -4,78 +4,82 @@ import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 
+export interface Categoria {
+  id?: number;
+  categoriaNombre: string;
+  descripcion: string;
+  estadoUsuarioId: number;
+  estadoUsuario?: EstadoUsuario;
+  fechaCreacion?: string;
+}
+
+export interface EstadoUsuario {
+  id: number;
+  nombre: string;
+}
+
 @Injectable({
-    providedIn: 'root'
+  providedIn: 'root'
 })
 export class CategoriaService {
-    private readonly apiUrl = `${environment.apiUrl}/api/categorias`;
+  private readonly apiUrl = `${environment.apiUrl}/api/categorias`;
 
-    constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
-    // Obtener todas las categorías
-    obtenerCategorias(): Observable<any[]> {
-        return this.http.get<any[]>(this.apiUrl).pipe(
-            map(categorias => categorias.map(cat => ({
-                ...cat,
-                Id: cat.id || cat.Id,
-                Nombre: cat.nombre || cat.Nombre,
-                Descripcion: cat.descripcion || cat.Descripcion,
-                EstadoId: cat.estadoId || cat.EstadoId,
-                estadoNombre: cat.estado?.nombre || cat.Estado?.Nombre
-            }))),
-            catchError(this.handleError)
-        );
+  // Obtener todas las categorías
+  obtenerCategorias(): Observable<Categoria[]> {
+    return this.http.get<Categoria[]>(this.apiUrl).pipe(
+      map(categorias => categorias.map(cat => this.mapearCategoria(cat)))
+    );
+  }
+
+  // Obtener una categoría por ID
+  obtenerCategoria(id: number): Observable<Categoria> {
+    return this.http.get<Categoria>(`${this.apiUrl}/${id}`).pipe(
+      map(categoria => this.mapearCategoria(categoria))
+    );
+  }
+
+  // Guardar categoría (crear nueva o actualizar existente)
+  guardarCategoria(categoria: Categoria): Observable<any> {
+    const categoriaBackend = this.mapearCategoriaParaBackend(categoria);
+    
+    if (categoria.id && categoria.id > 0) {
+      return this.http.put(`${this.apiUrl}/${categoria.id}`, categoriaBackend);
+    } else {
+      return this.http.post(this.apiUrl, categoriaBackend);
     }
+  }
 
-    // Obtener una categoría por ID
-    obtenerCategoriaPorId(id: number): Observable<any> {
-        return this.http.get<any>(`${this.apiUrl}/${id}`).pipe(
-            catchError(this.handleError)
-        );
-    }
+  // Eliminar una categoría
+  eliminarCategoria(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${id}`);
+  }
 
-    // Guardar o actualizar una categoría
-    guardarCategoria(categoria: any): Observable<any> {
-        const categoriaParaEnviar = {
-            Id: categoria.Id || 0,
-            Nombre: categoria.Nombre,
-            Descripcion: categoria.Descripcion,
-            EstadoId: categoria.EstadoId
-        };
+  // Obtener estados desde el backend
+  obtenerEstados(): Observable<EstadoUsuario[]> {
+    return this.http.get<EstadoUsuario[]>(`${this.apiUrl}/estados`);
+  }
 
-        if (!categoriaParaEnviar.Id) {
-            return this.http.post<any>(this.apiUrl, categoriaParaEnviar).pipe(
-                catchError(this.handleError)
-            );
-        } else {
-            return this.http.put<any>(`${this.apiUrl}/${categoriaParaEnviar.Id}`, categoriaParaEnviar).pipe(
-                catchError(this.handleError)
-            );
-        }
-    }
+  // Métodos privados para mapeo entre modelos frontend y backend
+  private mapearCategoria(categoriaBackend: any): Categoria {
+    return {
+      id: categoriaBackend.id,
+      categoriaNombre: categoriaBackend.categoriaNombre,
+      descripcion: categoriaBackend.descripcion,
+      estadoUsuarioId: categoriaBackend.estadoUsuarioId,
+      estadoUsuario: categoriaBackend.estadoUsuario,
+      // Usando fecha actual como placeholder si no hay fecha de creación
+      fechaCreacion: new Date().toISOString() 
+    };
+  }
 
-    // Eliminar categoría
-    eliminarCategoria(id: number): Observable<any> {
-        return this.http.delete<any>(`${this.apiUrl}/${id}`).pipe(
-            catchError(this.handleError)
-        );
-    }
-
-    // Manejo de errores
-    private handleError(error: any): Observable<never> {
-        console.error('Error detallado:', error);
-        let mensajeError = 'Ha ocurrido un error';
-
-        if (error?.error?.errors) {
-            mensajeError = Object.entries(error.error.errors)
-                .map(([key, value]) => `${key}: ${Array.isArray(value) ? value.join(', ') : value}`)
-                .join('\n');
-        } else if (error?.error?.message) {
-            mensajeError = error.error.message;
-        } else if (error?.message) {
-            mensajeError = error.message;
-        }
-
-        return throwError(() => new Error(mensajeError));
-    }
+  private mapearCategoriaParaBackend(categoriaFrontend: Categoria): any {
+    return {
+      id: categoriaFrontend.id || 0,
+      categoriaNombre: categoriaFrontend.categoriaNombre,
+      descripcion: categoriaFrontend.descripcion,
+      estadoUsuarioId: categoriaFrontend.estadoUsuarioId
+    };
+  }
 }

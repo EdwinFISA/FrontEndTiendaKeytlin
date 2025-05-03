@@ -49,14 +49,15 @@ export class PermisosModalComponent implements OnInit {
                     this.cargando = false;
                 },
                 error: (error) => {
-                    console.error('Error al obtener permisos asignados:', error);
-                    this.cargando = false;
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'No se pudieron cargar los permisos asignados.'
-                    });
-                }
+                  console.warn('Este rol aún no cuenta con permisos asignados.');
+                  this.permisosAsignados = [];
+                  this.cargando = false;
+                  Swal.fire({
+                      icon: 'info',
+                      title: 'Sin permisos',
+                      text: 'Este rol aún no cuenta con permisos asignados.'
+                  });
+              }
             });
         },
         error: (error) => {
@@ -134,16 +135,16 @@ export class PermisosModalComponent implements OnInit {
 }
 
 
-  permisosFiltrados(): Permiso[] {
-    if (!this.filtroPermiso.trim()) {
-      return this.todosLosPermisos;
-    }
-    
-    const filtro = this.filtroPermiso.toLowerCase();
-    return this.todosLosPermisos.filter(permiso => 
-      permiso.codigo.toLowerCase().includes(filtro)
-    );
+permisosFiltrados(): Permiso[] {
+  if (!this.filtroPermiso.trim()) {
+    return this.todosLosPermisos;
   }
+
+  const filtro = this.filtroPermiso.toLowerCase();
+  return this.todosLosPermisos.filter(permiso => 
+    permiso.nombre.toLowerCase().includes(filtro)
+  );
+}
 
   contarSeleccionados(): number {
     return Object.values(this.permisosSeleccionados).filter(selected => selected).length;

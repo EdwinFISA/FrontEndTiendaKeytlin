@@ -4,6 +4,7 @@ import Swal from 'sweetalert2';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { UsuarioModalComponent } from '../usuarios-modal/usuarios-modal.component';
+import { AuthService } from '../../../../services/auth.service';
 
 
 @Component({
@@ -20,6 +21,12 @@ export class UsuariosComponent implements OnInit {
   modoVista: boolean = false;
   @ViewChild(UsuarioModalComponent) usuarioModalComponent!: UsuarioModalComponent;
 
+ //Variables de Permisos
+  puedeCrear: boolean = false;
+  puedeEditar: boolean = false;
+  puedeEliminar: boolean = false;
+  puedeVer: boolean = false;
+
   // Filtros
   filtroUsuario = '';
   fechaInicio: string = '';
@@ -29,14 +36,18 @@ export class UsuariosComponent implements OnInit {
   paginaActual = 1;
   elementosPorPagina = 10;
 
-  constructor(private usuarioService: UsuarioService) { }
+  constructor(private usuarioService: UsuarioService, 
+    private authService: AuthService
+    )  { }
 
   originalUsuarios: any[] = [];
 
   ngOnInit(): void {
     this.cargarUsuarios();
     this.verificarPropiedadesUsuarios();
+    this.cargarPermisos();
   }
+  
 
   cargarUsuarios() {
     this.usuarioService.obtenerUsuarios().subscribe({
@@ -61,6 +72,15 @@ export class UsuariosComponent implements OnInit {
       console.log('Estructura de Usuarios:', Object.keys(this.usuarios[0]));
       console.log('Primer Usuario:', this.usuarios[0]);
     }
+  }
+
+  cargarPermisos() {
+    const permisos = this.authService.obtenerPermisos(); // o donde guardes los permisos del usuario
+  
+    this.puedeCrear = permisos.includes('Crear Usuarios');
+    this.puedeEditar = permisos.includes('Editar Usuarios');
+    this.puedeEliminar = permisos.includes('Eliminar Usuarios');
+    this.puedeVer = permisos.includes('Ver Usuarios');
   }
 
   buscarUsuario() {

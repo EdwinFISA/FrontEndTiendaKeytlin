@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ProveedoresModalComponent } from '../proveedores-modal/proveedores-modal.component';
 import { ProveedorService, Proveedor } from '../../../../services/proveedor.service';
+import { AuthService } from '../../../../services/auth.service';
+
 
 @Component({
   selector: 'app-proveedores',
@@ -23,10 +25,19 @@ export class ProveedoresComponent implements OnInit {
   paginaActual: number = 1;
   registrosPorPagina: number = 10;
 
-  constructor(private proveedorService: ProveedorService) { }
+   //Variables de Permisos
+  puedeCrear: boolean = false;
+  puedeEditar: boolean = false;
+  puedeEliminar: boolean = false;
+  puedeVer: boolean = false; 
+
+  constructor(private proveedorService: ProveedorService,
+    private authService: AuthService
+  ) { }
 
   ngOnInit() {
     this.obtenerProveedores();
+    this.cargarPermisos();
   }
 
   obtenerProveedores() {
@@ -37,6 +48,15 @@ export class ProveedoresComponent implements OnInit {
       },
       error: (error) => console.error('Error al obtener proveedores:', error)
     });
+  }
+
+  cargarPermisos() {
+    const permisos = this.authService.obtenerPermisos(); // o donde guardes los permisos del usuario
+  
+    this.puedeCrear = permisos.includes('Crear Proveedores');
+    this.puedeEditar = permisos.includes('Editar Proveedores');
+    this.puedeEliminar = permisos.includes('Eliminar Proveedores');
+    this.puedeVer = permisos.includes('Ver Proveedores');
   }
 
   buscarProveedor() {

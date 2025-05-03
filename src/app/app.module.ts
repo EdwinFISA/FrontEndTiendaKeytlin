@@ -38,9 +38,9 @@ import { OlvidarContrasenaComponent } from './components/olvidar-contrasena/olvi
 import { RolesComponent } from './Menu/Administracion/Roles/roles/roles.component';
 import { RolesModalComponent } from './Menu/Administracion/Roles/roles-modal/roles-modal.component';
 import { PermisosModalComponent } from './Menu/Administracion/Roles/permisos-modal/permisos-modal.component';
-import { AccessDeniedComponent } from './components/login/access-denied.component';
 import { HasPermissionDirective } from '../directives/has-permission.directive';
 import { PermisosGuard } from './guards/permisos.guard';
+import { AccessoDenegadoComponent } from './components/acceso-denegado/acceso-denegado.component';
 
 export function tokenGetter() {
   return localStorage.getItem('token');
@@ -68,8 +68,8 @@ export function tokenGetter() {
     RolesComponent,
     RolesModalComponent,
     PermisosModalComponent,
-    AccessDeniedComponent,
     HasPermissionDirective,
+    AccessoDenegadoComponent,
   ],
   imports: [
     BrowserModule,

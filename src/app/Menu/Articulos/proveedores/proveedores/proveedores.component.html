@@ -9,10 +9,10 @@
     <!-- Buscador -->
     <div class="flex border rounded-md p-2">
       <input type="text"
-             placeholder="Buscar proveedor"
-             class="outline-none px-2"
-             [(ngModel)]="filtroProveedor"
-             (keyup.enter)="buscarProveedor()" />
+            placeholder="Buscar proveedor"
+            class="outline-none px-2"
+            [(ngModel)]="filtroProveedor"
+            (keyup.enter)="buscarProveedor()" />
       <button (click)="buscarProveedor()" class="ml-2 text-blue-500">
         🔍
       </button>
@@ -20,14 +20,14 @@
 
     <!-- Modal -->
     <app-proveedores-modal *ngIf="mostrarModal"
-                           [proveedor]="proveedorSeleccionado"
-                           [modoVer]="modoVer"
-                           (cerrarModal)="cerrarModal()"
-                           (guardarProveedor)="manejarProveedorGuardado($event)">
+                          [proveedor]="proveedorSeleccionado"
+                          [modoVer]="modoVer"
+                          (cerrarModal)="cerrarModal()"
+                          (guardarProveedor)="manejarProveedorGuardado($event)">
     </app-proveedores-modal>
 
     <!-- Botón Agregar proveedor -->
-    <button class="bg-black text-white px-4 py-2 rounded-md"
+    <button class="bg-black text-white px-4 py-2 rounded-md" *ngIf="puedeCrear"
             (click)="abrirModal()">
       Agregar proveedor
     </button>
@@ -53,16 +53,17 @@
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ proveedor.telefono }}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ proveedor.estado }}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 flex space-x-2">
-              <button class="text-blue-600 hover:text-blue-800 transition-colors duration-200" 
+              <button class="text-blue-600 hover:text-blue-800 transition-colors duration-200" *ngIf="puedeVer"
               (click)="abrirModal(proveedor, true)"
               title="Ver detalles">
               <i class="fas fa-eye"></i>
               </button>
-              <button class="text-green-600 hover:text-green-800 transition-colors duration-200" (click)="abrirModal(proveedor)"
+              <button class="text-green-600 hover:text-green-800 transition-colors duration-200" *ngIf="puedeEditar" 
+              (click)="abrirModal(proveedor)"
               title="Editar">
               <i class="fas fa-edit"></i>
               </button>
-              <button class="text-red-600 hover:text-red-800 transition-colors duration-200" 
+              <button class="text-red-600 hover:text-red-800 transition-colors duration-200" *ngIf="puedeEliminar"
               (click)="eliminarProveedor(proveedor.id)"
               title="Eliminar">
               <i class="fas fa-trash"></i>

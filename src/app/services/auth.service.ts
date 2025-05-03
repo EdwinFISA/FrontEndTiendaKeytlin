@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
-import { of } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 export interface LoginModel {
@@ -54,7 +53,7 @@ export class AuthService {
   login(loginData: LoginModel): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(`${this.apiUrl}/login`, loginData).pipe(
       tap(response => {
-        console.log('Login response:', response); // Agregar para debug
+        console.log('Login response:', response); 
         this.handleLoginSuccess(response);
       }),
       catchError(error => {
@@ -84,9 +83,7 @@ export class AuthService {
     
     if (!token) return false;
     
-    // En una aplicación real, también deberías validar la expiración del token
     try {
-      // Verificar si el token no está expirado usando fecha de expiración almacenada
       const expiration = localStorage.getItem('tokenExpiration');
       if (expiration) {
         return new Date(expiration) > new Date();
@@ -119,14 +116,12 @@ export class AuthService {
     
     // Extraer fecha de expiración del token (opcional, pero útil)
     try {
-      // Si usas JWT, puedes decodificarlo para obtener la expiración
       const payload = JSON.parse(atob(response.token.split('.')[1]));
       const expirationDate = new Date(payload.exp * 1000).toISOString();
       localStorage.setItem('tokenExpiration', expirationDate);
       console.log('Token expiration set:', expirationDate);
     } catch (e) {
       console.error('Error extracting token expiration:', e);
-      // Si no puedes extraer la expiración, establece un tiempo predeterminado (24h)
       const expirationDate = new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toISOString();
       localStorage.setItem('tokenExpiration', expirationDate);
     }
@@ -144,8 +139,8 @@ export class AuthService {
     localStorage.setItem('currentUser', JSON.stringify(user));
     this.currentUserSubject.next(user);
 
-     // Almacenar permisos por separado para acceso rápido
-  localStorage.setItem('userPermissions', JSON.stringify(response.userPermissions));
+    // Almacenar permisos por separado para acceso rápido
+    localStorage.setItem('userPermissions', JSON.stringify(response.userPermissions));
 
     // Set auto logout timer
     const expiration = localStorage.getItem('tokenExpiration');
@@ -157,26 +152,35 @@ export class AuthService {
   }
 
   // Añadir método para verificar permisos
-hasPermission(permissionName: string): boolean {
-  // Verificar si el usuario está autenticado
-  if (!this.isAuthenticated()) {
-    return false;
+  hasPermission(permissionName: string): boolean {
+    if (!this.isAuthenticated()) {
+      return false;
+    }
+
+    const user = this.currentUserValue;
+
+    if (!user || !user.permisos) {
+      return false;
+    }
+
+    return user.permisos.includes(permissionName);
   }
 
-  // Obtener permisos del localStorage
-  const permissionsString = localStorage.getItem('userPermisos');
-  if (!permissionsString) {
-    return false;
+  // Método para obtener los permisos almacenados
+  obtenerPermisos(): string[] {
+    // Verificar si el usuario está autenticado
+    if (this.isAuthenticated()) {
+      // Obtener los permisos desde el localStorage o el currentUser
+      const permisos = this.currentUserValue?.permisos || [];
+      return permisos;
+    }
+    return [];  // Si el usuario no está autenticado, devolver un arreglo vacío
   }
-
-  try {
-    const permissions: string[] = JSON.parse(permissionsString);
-    return permissions.includes(permissionName);
-  } catch (error) {
-    console.error('Error parsing permisos:', error);
-    return false;
+  
+  tienePermiso(permiso: string): boolean {
+    const permisos = this.obtenerPermisos(); // localStorage o variable en memoria
+    return permisos.includes(permiso);
   }
-}
 
   private setAutoLogoutTimer(expiration: string): void {
     const expirationDate = new Date(expiration);
@@ -199,7 +203,7 @@ hasPermission(permissionName: string): boolean {
     localStorage.removeItem('token');
     localStorage.removeItem('tokenExpiration');
     localStorage.removeItem('currentUser');
-    localStorage.removeItem('userPermissions'); 
+    localStorage.removeItem('userPermissions');
     this.currentUserSubject.next(null);
 
     if (this.tokenExpirationTimer) {
@@ -229,30 +233,29 @@ hasPermission(permissionName: string): boolean {
     }
     return new Error('Login failed: Compruebe su Correo o Contraseña');
   }
+
   enviarCodigoRecuperacion(correo: string): Observable<any> {
     return this.http.post(`${this.apiUrl}/recuperar-contrasena`, JSON.stringify(correo), {
       headers: { 'Content-Type': 'application/json' }
     }).pipe(
       catchError(error => {
-        // Verificar si el error es un HTTP error real
         console.error('Error en la solicitud:', error);
         return throwError(error); // Retornar el error para que se pueda manejar en el componente
       })
     );
   }
-  
+
   verificarCodigoRecuperacion(correo: string, codigo: string): Observable<any> {
     return this.http.post(`${this.apiUrl}/verificar-codigo-recuperacion`, {
       correo: correo,
       codigo: codigo
     }).pipe(
       catchError((error) => {
-        // Si hay un error real (status diferente a 200), lo gestionamos.
         return throwError(error);
       })
     );
   }
-  
+
   cambiarContrasena(correo: string, nuevaContrasena: string, codigo: string): Observable<any> {
     return this.http.post(`${this.apiUrl}/reset-password`, {
       correo: correo,
@@ -260,7 +263,4 @@ hasPermission(permissionName: string): boolean {
       verificationCode: codigo
     });
   }
-
-
-  
 }

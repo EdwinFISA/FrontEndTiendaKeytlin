@@ -1,54 +1,74 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, EventEmitter, Input, OnInit, OnChanges, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-
-interface Categoria {
-  Id?: number;
-  Nombre?: string;
-  Descripcion?: string;
-  Estado?: string;
-  fechaCreacion?: string;
-}
+import { CommonModule } from '@angular/common';
+import { Categoria, EstadoUsuario } from '../../../../services/categoria.service';
 
 @Component({
   selector: 'app-categoria-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule, CommonModule],
   templateUrl: './categoria-modal.component.html',
-  styleUrl: './categoria-modal.component.css',
+  styleUrls: ['./categoria-modal.component.css']
 })
-export class CategoriaModalComponent {
+export class CategoriaModalComponent implements OnInit, OnChanges {
   @Input() categoria: Categoria | null = null;
-  @Input() modoVista: 'crear' | 'editar' | 'ver' = 'crear';
+  @Input() estados: EstadoUsuario[] = [];
+  @Input() modoVista: boolean = false;
+  @Input() modoEdicion: boolean = false;
   
   @Output() guardar = new EventEmitter<Categoria>();
   @Output() cerrar = new EventEmitter<void>();
 
+  // Variables para el formulario
   nombreCategoria: string = '';
   descripcion: string = '';
-  estado: string = 'Activo';
+  estadoId: number = 1;
 
-  ngOnInit() {
+  constructor() { }
+
+  ngOnInit(): void {
+    this.inicializarFormulario();
+  }
+
+  ngOnChanges(): void {
+    this.inicializarFormulario();
+  }
+
+  inicializarFormulario(): void {
     if (this.categoria) {
-      this.nombreCategoria = this.categoria.Nombre || '';
-      this.descripcion = this.categoria.Descripcion || '';
-      this.estado = this.categoria.Estado || 'Activo';
+      this.nombreCategoria = this.categoria.categoriaNombre || '';
+      this.descripcion = this.categoria.descripcion || '';
+      this.estadoId = this.categoria.estadoUsuarioId || 1;
+    } else {
+      this.nombreCategoria = '';
+      this.descripcion = '';
+      this.estadoId = 1; // Estado por defecto (Activo)
     }
   }
 
-  guardarCategoria() {
+  guardarCategoria(): void {
+    if (!this.nombreCategoria.trim()) {
+      alert('El nombre de la categoría es obligatorio');
+      return;
+    }
+    
     const categoriaActualizada: Categoria = {
-      Id: this.categoria?.Id || 0,
-      Nombre: this.nombreCategoria,
-      Descripcion: this.descripcion,
-      Estado: this.estado,
+      id: this.categoria?.id || 0,
+      categoriaNombre: this.nombreCategoria,
+      descripcion: this.descripcion,
+      estadoUsuarioId: this.estadoId,
       fechaCreacion: this.categoria?.fechaCreacion
     };
     
     this.guardar.emit(categoriaActualizada);
   }
 
-  cancelar() {
+  cancelar(): void {
     this.cerrar.emit();
+  }
+
+  getTitulo(): string {
+    if (this.modoVista) return 'Ver Categoría';
+    return (this.categoria?.id && this.categoria.id > 0) ? 'Editar Categoría' : 'Agregar categoría';
   }
 }
