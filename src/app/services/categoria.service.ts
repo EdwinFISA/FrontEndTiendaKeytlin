@@ -5,6 +5,7 @@ import { catchError, map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 
 export interface Categoria {
+
   id?: number;
   categoriaNombre: string;
   descripcion: string;

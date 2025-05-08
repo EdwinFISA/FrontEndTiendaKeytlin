@@ -3,12 +3,27 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
+import { Categoria } from './categoria.service';
+import { Proveedor } from './proveedor.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProductoService {
-  private readonly apiUrl = `${environment.apiUrl}/api/productos`;
+  obtenerCategorias(): Observable<Categoria[]> {
+    return this.http.get<Categoria[]>(`${environment.apiUrl}/api/categorias`);
+  }
+  
+  obtenerProveedores(): Observable<Proveedor[]> {
+    return this.http.get<Proveedor[]>(`${environment.apiUrl}/api/proveedores`);
+  }
+  
+  obtenerEstados(): Observable<any[]> {
+    return this.http.get<any[]>(`${environment.apiUrl}/api/categorias/estados`);
+  }
+  
+
+  private readonly apiUrl = `${environment.apiUrl}/api/Producto`;
 
   constructor(private http: HttpClient) { }
 
@@ -18,6 +33,7 @@ export class ProductoService {
       catchError(this.handleError)
     );
   }
+  
 
   // Obtener un producto por ID
   obtenerProductoPorId(id: number): Observable<any> {
@@ -64,6 +80,8 @@ export class ProductoService {
   public getImagenUrl(nombreImagen: string): string {
     return `${this.apiUrl}/imagenes/${nombreImagen}`;
   }
+
+  
 
   // Manejo de errores
   private handleError(error: any): Observable<never> {

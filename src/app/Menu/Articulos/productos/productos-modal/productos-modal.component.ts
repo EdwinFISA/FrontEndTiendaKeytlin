@@ -2,9 +2,16 @@ import { Component, EventEmitter, Inject, Input, OnInit, Output, ViewChild } fro
 import { FormsModule, NgForm } from '@angular/forms';
 import { CommonModule, DOCUMENT } from '@angular/common';
 import { ProductoService } from '../../../../services/productos.service';
+import { Categoria, CategoriaService } from '../../../../services/categoria.service';
+import { Proveedor, ProveedorService } from '../../../../services/proveedor.service';
 
 // Interfaces para tipado fuerte
 interface Producto {
+  Codigo?: number;
+  Marca?: string;
+  PrecioCompra: number | null;
+  PrecioVenta: number | null;
+  ProveedorId?: any;
   Id?: number;
   Nombre?: string;
   Descripcion?: string;
@@ -15,7 +22,10 @@ interface Producto {
   Imagen?: string;
   Categoria?: any;
   Estado?: any;
+//   categorias: Categoria[] = [];
+// proveedores: Proveedor[] = [];
 }
+
 
 @Component({
   selector: 'app-productos-modal',
@@ -26,25 +36,69 @@ interface Producto {
 })
 
 export class ProductosModalComponent implements OnInit {
-  @Input() producto: Producto = {};
+  @Input() producto: Producto = {
+    PrecioCompra: null,
+    PrecioVenta: null
+  };
   @Input() modoVista: boolean = false;
   @Output() cerrar = new EventEmitter<void>();
   @Output() guardar = new EventEmitter<Producto>();
   @ViewChild('productoForm') productoForm!: NgForm;
 
-  categorias: any[] = [];
-  estados: any[] = [];
+
   imagenPrevia: string | ArrayBuffer | null = null;
   archivoImagen: File | null = null;
   cargando = false;
+  categorias: Categoria[] = [];
+  proveedores: Proveedor[] = [];
+  estados: any[] = [];
 
   constructor(
     private productoService: ProductoService,
+    private categoriaService: CategoriaService,
+    private proveedorService: ProveedorService,
     @Inject(DOCUMENT) private document: Document
   ) {}
+  
+
   ngOnInit(): void {
-    throw new Error('Method not implemented.');
+  
+    this.cargarDatos(); // Esta ya carga categorías, proveedores y estados
+  
+    if (this.producto.Imagen) {
+      this.imagenPrevia = this.getImagenUrl(this.producto.Imagen);
+    }
   }
+  
+  cargarDatos(): void {
+    this.productoService.obtenerCategorias().subscribe(categorias => {
+      console.log('Categorías cargadas:', categorias);
+      this.categorias = categorias;
+      if (!this.producto.Id) {
+        const porDefecto = categorias.find(c => c.categoriaNombre?.toLowerCase() === 'general');
+        if (porDefecto) this.producto.CategoriaId = porDefecto.id;
+      }
+    });
+  
+    this.productoService.obtenerProveedores().subscribe(proveedores => {
+      this.proveedores = proveedores;
+      if (!this.producto.Id && proveedores.length > 0) {
+        this.producto.ProveedorId = proveedores[0].id;
+      }
+    });
+  
+    // this.productoService.obtenerEstados().subscribe(estados => {
+    //   this.estados = estados;
+    //   if (!this.producto.Id) {
+    //     const estadoActivo = estados.find(e => e.Nombre?.toLowerCase() === 'activo');
+    //     if (estadoActivo) this.producto.EstadoId = estadoActivo.Id;
+    //   }
+    // 
+    // });
+  }  
+  
+
+  
 
   /*ngOnInit(): void {
     this.cargarDatos();
@@ -109,10 +163,10 @@ export class ProductosModalComponent implements OnInit {
   async onSubmit(): Promise<void> {
     if (this.cargando) return;
 
-    if (this.productoForm.invalid || !this.validarFormulario()) {
-      this.marcarCamposComoTocados();
-      return;
-    }
+    // if (this.productoForm.invalid || !this.validarFormulario()) {
+    //   this.marcarCamposComoTocados();
+    //   return;
+    // }
 
     this.cargando = true;
 
@@ -124,7 +178,7 @@ export class ProductosModalComponent implements OnInit {
 
       const productoCompleto: Producto = {
         ...this.producto,
-        Categoria: this.categorias.find(c => c.Id === this.producto.CategoriaId),
+        Categoria: this.categorias.find(c => c.id === this.producto.CategoriaId),
         Estado: this.estados.find(e => e.Id === this.producto.EstadoId)
       };
 
@@ -137,22 +191,23 @@ export class ProductosModalComponent implements OnInit {
     }
   }
 
-  private validarFormulario(): boolean {
-    const camposRequeridos = [
-      { campo: this.producto.Nombre?.trim(), mensaje: 'El nombre es requerido' },
-      { campo: this.producto.Precio, mensaje: 'El precio es requerido' },
-      { campo: this.producto.Stock, mensaje: 'El stock es requerido' }
-    ];
+  // private validarFormulario(): boolean {
+  //   // const camposRequeridos = [
+  //   //   // { campo: this.producto.Nombre?.trim(), mensaje: 'El nombre es requerido' },
+  //   //   // { campo: this.producto.Precio, mensaje: 'El precio es requerido' },
+  //   //   // { campo: this.producto.Stock, mensaje: 'El stock es requerido' }
+  //   // ];
 
-    for (const { campo, mensaje } of camposRequeridos) {
-      if (campo === undefined || campo === null || campo === '') {
-        alert(mensaje);
-        return false;
-      }
-    }
+  //   for (const { campo, mensaje } of camposRequeridos) {
+  //     if (campo === undefined || campo === null || campo === '') {
+  //       alert(mensaje);
+  //       return false;
+  //     }
+  //   }
 
-    return true;
-  }
+  //   return true;
+  // }
+  
 
   private marcarCamposComoTocados(): void {
     if (!this.productoForm?.controls) return;
@@ -165,4 +220,3 @@ export class ProductosModalComponent implements OnInit {
     this.cerrar.emit();
   }
 }
-

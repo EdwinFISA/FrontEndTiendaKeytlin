@@ -1,177 +1,254 @@
 <div class="fixed inset-0 flex items-center justify-center z-50">
-    <div class="absolute inset-0 bg-black opacity-50"></div>
-    <div class="bg-white rounded-lg shadow-lg p-6 relative z-10 w-full max-w-4xl">
-      <div class="max-h-[75vh] overflow-y-auto rounded-lg pr-2">
-  
-        <span class="absolute top-0 right-0 p-4 cursor-pointer" (click)="cerrarModal()">&times;</span>
-        <h2 class="text-2xl font-bold mb-4 border-b pb-2 text-left">
-          {{ modoVista ? 'Detalles del producto' : producto.Id ? 'Editar producto' : 'Crear nuevo producto' }}
-        </h2>
-  
-        <form (ngSubmit)="!modoVista && onSubmit()" #productoForm="ngForm" novalidate>
-          <fieldset [disabled]="modoVista">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-              
-              <!-- Nombre -->
-              <div class="mb-4">
-                <label for="nombre" class="block text-sm font-medium mb-1 text-left" style="color: #670305;">
-                  Nombre <span style="color: #670305;">*</span>
-                </label>
-                <input
-                  type="text"
-                  id="nombre"
-                  name="nombre"
-                  maxlength="100"
-                  [(ngModel)]="producto.Nombre"
-                  #nombre="ngModel"
-                  required
-                  [class.bg-gray-100]="modoVista"
-                  class="rounded w-full py-2 px-3 focus:outline-none focus:ring-1"
-                  style="border: 1px solid #070826; color: #670305;"
-                />
-                <div *ngIf="nombre.invalid && (nombre.dirty || nombre.touched)" class="text-red-500 text-sm mt-1">
-                  <div *ngIf="nombre.errors?.['required']">El nombre es obligatorio.</div>
-                  <div *ngIf="nombre.errors?.['maxlength']">Máximo 100 caracteres.</div>
-                </div>
-              </div>
-  
-              <!-- Precio -->
-              <div class="mb-4">
-                <label for="precio" class="block text-sm font-medium mb-1 text-left" style="color: #670305;">
-                  Precio <span style="color: #670305;">*</span>
-                </label>
-                <input
-                  type="number"
-                  id="precio"
-                  name="precio"
-                  min="0.01"
-                  step="0.01"
-                  [(ngModel)]="producto.Precio"
-                  #precio="ngModel"
-                  required
-                  [class.bg-gray-100]="modoVista"
-                  class="rounded w-full py-2 px-3 focus:outline-none focus:ring-1"
-                  style="border: 1px solid #070826; color: #670305;"
-                />
-                <div *ngIf="precio.invalid && (precio.dirty || precio.touched)" class="text-red-500 text-sm mt-1">
-                  <div *ngIf="precio.errors?.['required']">El precio es obligatorio.</div>
-                  <div *ngIf="precio.errors?.['min']">Debe ser mayor a 0.</div>
-                </div>
-              </div>
-  
-              <!-- Stock -->
-              <div class="mb-4">
-                <label for="stock" class="block text-sm font-medium mb-1 text-left" style="color: #670305;">
-                  Stock <span style="color: #670305;">*</span>
-                </label>
-                <input
-                  type="number"
-                  id="stock"
-                  name="stock"
-                  min="0"
-                  step="1"
-                  [(ngModel)]="producto.Stock"
-                  #stock="ngModel"
-                  required
-                  [class.bg-gray-100]="modoVista"
-                  class="rounded w-full py-2 px-3 focus:outline-none focus:ring-1"
-                  style="border: 1px solid #070826; color: #670305;"
-                />
-                <div *ngIf="stock.invalid && (stock.dirty || stock.touched)" class="text-red-500 text-sm mt-1">
-                  <div *ngIf="stock.errors?.['required']">El stock es obligatorio.</div>
-                  <div *ngIf="stock.errors?.['min']">Debe ser 0 o mayor.</div>
-                </div>
-              </div>
-  
-              <!-- Categoría -->
-              <div class="mb-4">
-                <label for="categoria" class="block text-sm font-medium mb-1 text-left" style="color: #670305;">
-                  Categoría <span style="color: #670305;">*</span>
-                </label>
-                <select
-                  id="categoria"
-                  name="categoria"
-                  [(ngModel)]="producto.CategoriaId"
-                  #categoria="ngModel"
-                  required
-                  [class.bg-gray-100]="modoVista"
-                  class="rounded w-full py-2 px-3 appearance-none focus:outline-none focus:ring-1"
-                  style="border: 1px solid #070826; color: #670305;">
-                  <option value="">Seleccione una categoría</option>
-                  <option *ngFor="let categoria of categorias" [ngValue]="categoria.Id || categoria.id">
-                    {{ categoria.Nombre || categoria.nombre }}
-                  </option>
-                </select>
-                <div *ngIf="categoria.invalid && (categoria.dirty || categoria.touched)" class="text-red-500 text-sm mt-1">
-                  <div *ngIf="categoria.errors?.['required']">Debe seleccionar una categoría.</div>
-                </div>
-              </div>
-  
-              <!-- Descripción -->
-              <div class="mb-4 md:col-span-3">
-                <label for="descripcion" class="block text-sm font-medium mb-1 text-left" style="color: #670305;">
-                  Descripción
-                </label>
-                <textarea
-                  id="descripcion"
-                  name="descripcion"
-                  maxlength="500"
-                  rows="3"
-                  [(ngModel)]="producto.Descripcion"
-                  [class.bg-gray-100]="modoVista"
-                  class="rounded w-full py-2 px-3 focus:outline-none focus:ring-1 resize-none"
-                  style="border: 1px solid #070826; color: #670305;"></textarea>
-              </div>
-  
-              <!-- Imagen -->
-              <div class="mb-4 md:col-span-3">
-                <label class="block text-sm font-medium mb-1 text-left">
-                  Imagen del producto
-                </label>
-                <div class="mb-3" *ngIf="imagenPrevia">
-                  <img [src]="imagenPrevia" alt="Vista previa de imagen"
-                    class="h-24 w-24 object-cover rounded-lg border border-gray-200">
-                </div>
-                <div class="flex items-center" *ngIf="!modoVista">
-                  <input type="file" id="fileInput" accept="image/jpeg, image/png" (change)="onFileSelected($event)"
-                    class="hidden">
-                  <button type="button" (click)="onFileInputClick()" [disabled]="cargando"
-                    class="bg-[#011552] hover:bg-[#002a7a] text-white font-medium py-2 px-4 rounded transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
-                    <i class="fas fa-upload mr-2"></i>
-                    <span *ngIf="!cargando">Seleccionar imagen</span>
-                    <span *ngIf="cargando">Cargando...</span>
-                  </button>
-                  <span class="ml-3 text-sm text-gray-600" *ngIf="producto.Imagen">
-                    {{ producto.Imagen }}
-                  </span>
-                </div>
-                <p class="text-xs text-gray-500 mt-1">Formatos aceptados: JPG, PNG (Máx. 2MB)</p>
+  <div class="absolute inset-0 bg-black opacity-50"></div>
+  <div class="bg-white rounded-lg shadow-lg p-6 relative z-10 w-full max-w-4xl">
+    <div class="max-h-[75vh] overflow-y-auto rounded-lg pr-2">
+      <span class="absolute top-0 right-0 p-4 cursor-pointer" (click)="cerrarModal()">&times;</span>
+
+      <h2 class="text-2xl font-bold mb-4 border-b pb-2 text-left">
+        {{ modoVista ? 'Detalles del producto' : producto.Id ? 'Editar producto' : 'Agregar producto' }}
+      </h2>
+
+      <form (ngSubmit)="!modoVista && onSubmit()" #productoForm="ngForm" novalidate>
+        <fieldset [disabled]="modoVista">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+            <!-- Nombre -->
+            <div class="mb-4">
+              <label for="nombre" class="block text-sm font-medium mb-1 text-left" style="color: #670305;">
+                Nombre producto <span style="color: #670305;">*</span>
+              </label>
+              <input
+                type="text"
+                id="nombre"
+                name="nombre"
+                maxlength="100"
+                [(ngModel)]="producto.Nombre"
+                #nombre="ngModel"
+                required
+                [class.bg-gray-100]="modoVista"
+                class="rounded w-full py-2 px-3 focus:outline-none focus:ring-1"
+                style="border: 1px solid #070826; color: #670305;"
+              />
+              <div *ngIf="nombre.invalid && (nombre.dirty || nombre.touched)" class="text-red-500 text-sm mt-1">
+                <div *ngIf="nombre.errors?.['required']">El nombre es obligatorio.</div>
+                <div *ngIf="nombre.errors?.['maxlength']">Máximo 100 caracteres.</div>
               </div>
             </div>
-          </fieldset>
-  
-          <!-- Spinner -->
-          <div *ngIf="cargando" class="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
-            <div class="bg-white p-4 rounded-lg shadow-lg">
-              <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-[#011552] mx-auto"></div>
-              <p class="mt-2 text-center">Procesando...</p>
+
+            <!-- Código -->
+            <div class="mb-4">
+              <label for="codigo" class="block text-sm font-medium mb-1 text-left" style="color: #670305;">
+                Código producto <span style="color: #670305;">*</span>
+              </label>
+              <input
+                type="text"
+                id="codigo"
+                name="codigo"
+                maxlength="100"
+                [(ngModel)]="producto.Codigo"
+                #codigo="ngModel"
+                required
+                [class.bg-gray-100]="modoVista"
+                class="rounded w-full py-2 px-3 focus:outline-none focus:ring-1"
+                style="border: 1px solid #070826; color: #670305;"
+              />
+              <div *ngIf="codigo.invalid && (codigo.dirty || codigo.touched)" class="text-red-500 text-sm mt-1">
+                <div *ngIf="codigo.errors?.['required']">El código es obligatorio.</div>
+                <div *ngIf="codigo.errors?.['maxlength']">Máximo 100 caracteres.</div>
+              </div>
+            </div>
+
+            <!-- Marca -->
+            <div class="mb-4">
+              <label for="marca" class="block text-sm font-medium mb-1 text-left" style="color: #670305;">
+                Marca producto
+              </label>
+              <input
+                type="text"
+                id="marca"
+                name="marca"
+                maxlength="100"
+                [(ngModel)]="producto.Marca"
+                #marca="ngModel"
+                [class.bg-gray-100]="modoVista"
+                class="rounded w-full py-2 px-3 focus:outline-none focus:ring-1"
+                style="border: 1px solid #070826; color: #670305;"
+              />
+              <div *ngIf="marca.invalid && (marca.dirty || marca.touched)" class="text-red-500 text-sm mt-1">
+                <div *ngIf="marca.errors?.['maxlength']">Máximo 100 caracteres.</div>
+              </div>
+            </div>
+
+            <!-- Precio de adquisición -->
+            <div class="mb-4">
+              <label for="precioCompra" class="block text-sm font-medium mb-1 text-left" style="color: #670305;">
+                Precio de adquisición <span style="color: #670305;">*</span>
+              </label>
+              <input
+                type="number"
+                id="precioCompra"
+                name="precioCompra"
+                min="0.01"
+                step="0.01"
+                [(ngModel)]="producto.PrecioCompra"
+                #precioCompra="ngModel"
+                
+                [class.bg-gray-100]="modoVista"
+                class="rounded w-full py-2 px-3 focus:outline-none focus:ring-1"
+                style="border: 1px solid #070826; color: #670305;"
+              />
+              <div *ngIf="precioCompra.invalid && (precioCompra.dirty || precioCompra.touched)" class="text-red-500 text-sm mt-1">
+                <!-- <div *ngIf="precioCompra.errors?.['required']">El precio es obligatorio.</div> -->
+                <div *ngIf="precioCompra.errors?.['min']">Debe ser mayor a 0.</div>
+              </div>
+            </div>
+
+            <!-- Precio de venta -->
+            <div class="mb-4">
+              <label for="precioVenta" class="block text-sm font-medium mb-1 text-left" style="color: #670305;">
+                Precio de venta <span style="color: #670305;">*</span>
+              </label>
+              <input
+                type="number"
+                id="precioVenta"
+                name="precioVenta"
+                min="0.01"
+                step="0.01"
+                [(ngModel)]="producto.PrecioVenta"
+                #precioVenta="ngModel"
+                
+                [class.bg-gray-100]="modoVista"
+                class="rounded w-full py-2 px-3 focus:outline-none focus:ring-1"
+                style="border: 1px solid #070826; color: #670305;"
+              />
+              <div *ngIf="precioVenta.invalid && (precioVenta.dirty || precioVenta.touched)" class="text-red-500 text-sm mt-1">
+                <!-- <div *ngIf="precioVenta.errors?.['required']">El precio es obligatorio.</div> -->
+                <div *ngIf="precioVenta.errors?.['min']">Debe ser mayor a 0.</div>
+              </div>
+            </div>
+
+            <!-- Stock -->
+            <div class="mb-4">
+              <label for="stock" class="block text-sm font-medium mb-1 text-left" style="color: #670305;">
+                Stock <span style="color: #670305;">*</span>
+              </label>
+              <input
+                type="number"
+                id="stock"
+                name="stock"
+                min="0"
+                step="1"
+                [(ngModel)]="producto.Stock"
+                #stock="ngModel"
+                required
+                [class.bg-gray-100]="modoVista"
+                class="rounded w-full py-2 px-3 focus:outline-none focus:ring-1"
+                style="border: 1px solid #070826; color: #670305;"
+              />
+              <div *ngIf="stock.invalid && (stock.dirty || stock.touched)" class="text-red-500 text-sm mt-1">
+                <div *ngIf="stock.errors?.['required']">El stock es obligatorio.</div>
+                <div *ngIf="stock.errors?.['min']">Debe ser 0 o mayor.</div>
+              </div>
+            </div>
+
+            <!-- Categoría -->
+            <div class="mb-4">
+              <label for="categoria" class="block text-sm font-medium mb-1 text-left" style="color: #670305;">
+                Categoría <span style="color: #670305;">*</span>
+              </label>
+              <select
+                id="categoria"
+                name="categoria"
+                [(ngModel)]="producto.CategoriaId"
+                required
+                [class.bg-gray-100]="modoVista"
+                class="rounded w-full py-2 px-3 focus:outline-none focus:ring-1"
+                style="border: 1px solid #070826; color: #670305;"
+              >
+                <option value="">Seleccione una categoría</option>
+                <option *ngFor="let categoria of categorias" [value]="categoria.id">{{ categoria.categoriaNombre }}</option>
+              </select>
+            </div>
+
+            <!-- Proveedor -->
+            <div class="mb-4">
+              <label for="proveedor" class="block text-sm font-medium mb-1 text-left" style="color: #670305;">
+                Proveedor <span style="color: #670305;">*</span>
+              </label>
+              <select
+                id="proveedor"
+                name="proveedor"
+                [(ngModel)]="producto.ProveedorId"
+                required
+                [class.bg-gray-100]="modoVista"
+                class="rounded w-full py-2 px-3 focus:outline-none focus:ring-1"
+                style="border: 1px solid #070826; color: #670305;"
+              >
+                <option value="">Seleccione un proveedor</option>
+                <option *ngFor="let proveedor of proveedores" [value]="proveedor.id">{{ proveedor.nombreContacto }}</option>
+              </select>
+            </div>
+
+            <!-- Descripción -->
+            <div class="mb-4 md:col-span-3">
+              <label for="descripcion" class="block text-sm font-medium mb-1 text-left" style="color: #670305;">
+                Descripción
+              </label>
+              <textarea
+                id="descripcion"
+                name="descripcion"
+                maxlength="500"
+                rows="3"
+                [(ngModel)]="producto.Descripcion"
+                [class.bg-gray-100]="modoVista"
+                class="rounded w-full py-2 px-3 focus:outline-none focus:ring-1 resize-none"
+                style="border: 1px solid #070826; color: #670305;"></textarea>
+            </div>
+
+            <!-- Imagen -->
+            <div class="mb-4 md:col-span-3">
+              <label class="block text-sm font-medium mb-1 text-left">
+                Imagen del producto
+              </label>
+              <div class="mb-3" *ngIf="imagenPrevia">
+                <img [src]="imagenPrevia" alt="Vista previa de imagen"
+                  class="h-24 w-24 object-cover rounded-lg border border-gray-200">
+              </div>
+              <div class="flex items-center" *ngIf="!modoVista">
+                <input type="file" id="fileInput" accept="image/jpeg, image/png" (change)="onFileSelected($event)" class="hidden">
+                <button type="button" (click)="onFileInputClick()" [disabled]="cargando"
+                  class="bg-[#011552] hover:bg-[#002a7a] text-white font-medium py-2 px-4 rounded transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                  <i class="fas fa-upload mr-2"></i>
+                  <span *ngIf="!cargando">Seleccionar imagen</span>
+                  <span *ngIf="cargando">Cargando...</span>
+                </button>
+              </div>
+              <p class="text-xs text-gray-500 mt-1">Formatos aceptados: JPG, PNG (Máx. 2MB)</p>
             </div>
           </div>
-  
-          <!-- Botones -->
-          <div class="flex justify-end mt-6 space-x-3">
-            <button type="button" (click)="cerrarModal()"
-              class="px-4 py-2 border border-gray-300 rounded-md text-white bg-[#B40001] hover:bg-[#9b0000]">
-              {{ modoVista ? 'Cerrar' : 'Cancelar' }}
-            </button>
-  
-            <button type="submit" *ngIf="!modoVista" [disabled]="!productoForm.form.valid || cargando"
-              class="px-4 py-2 border border-transparent rounded-md shadow-sm text-white bg-[#070826] hover:bg-[#05061c] disabled:opacity-50 disabled:cursor-not-allowed">
-              Guardar
-            </button>
+        </fieldset>
+
+        <!-- Spinner -->
+        <div *ngIf="cargando" class="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+          <div class="bg-white p-4 rounded-lg shadow-lg">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-[#011552] mx-auto"></div>
+            <p class="mt-2 text-center">Procesando...</p>
           </div>
-        </form>
-      </div>
+        </div>
+
+        <!-- Botones -->
+        <div class="flex justify-end mt-6 space-x-3">
+          <button type="button" (click)="cerrarModal()"
+            class="px-4 py-2 border border-gray-300 rounded-md text-white bg-[#B40001] hover:bg-[#9b0000]">
+            {{ modoVista ? 'Cerrar' : 'Cancelar' }}
+          </button>
+
+          <button type="submit" *ngIf="!modoVista" [disabled]="!productoForm.form.valid || cargando"
+            class="px-4 py-2 border border-transparent rounded-md shadow-sm text-white bg-[#070826] hover:bg-[#05061c] disabled:opacity-50 disabled:cursor-not-allowed">
+            Guardar
+          </button>
+        </div>
+      </form>
     </div>
   </div>
-  
+</div>
