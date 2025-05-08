@@ -16,6 +16,7 @@ export interface LoginResponse {
   userApellido: string;
   userEmail: string;
   userRole: string;
+  userImage?: string;
   userPermissions: string[];
 }
 
@@ -25,6 +26,7 @@ export interface User {
   name: string;
   apellido: string;
   role: string;
+  imagen?: string;
   permisos?: string[];
 }
 
@@ -125,7 +127,7 @@ export class AuthService {
       const expirationDate = new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toISOString();
       localStorage.setItem('tokenExpiration', expirationDate);
     }
-
+  
     // Store user data
     const user: User = {
       id: response.userId,
@@ -133,15 +135,16 @@ export class AuthService {
       name: response.userName,
       apellido: response.userApellido,
       role: response.userRole,
+      imagen: response.userImage || '', 
       permisos: response.userPermissions
     };
-
+  
     localStorage.setItem('currentUser', JSON.stringify(user));
     this.currentUserSubject.next(user);
-
+  
     // Almacenar permisos por separado para acceso rápido
     localStorage.setItem('userPermissions', JSON.stringify(response.userPermissions));
-
+  
     // Set auto logout timer
     const expiration = localStorage.getItem('tokenExpiration');
     if (expiration) {
@@ -263,4 +266,19 @@ export class AuthService {
       verificationCode: codigo
     });
   }
+
+  // Método para obtener la URL completa de la imagen de usuario
+getImageUrl(imagePath: string | undefined): string {
+  if (!imagePath) {
+    return 'assets/images/default-user.png'; // Imagen por defecto
+  }
+  
+  // Si ya es una URL completa o base64, devolverla directamente
+  if (imagePath.startsWith('http') || imagePath.startsWith('data:image')) {
+    return imagePath;
+  }
+  
+  // Construir la URL completa
+  return `${environment.apiUrl}/images/usuarios/${imagePath}`;
+}
 }

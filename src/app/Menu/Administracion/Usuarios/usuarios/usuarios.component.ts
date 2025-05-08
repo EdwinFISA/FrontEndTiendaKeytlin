@@ -75,7 +75,7 @@ export class UsuariosComponent implements OnInit {
   }
 
   cargarPermisos() {
-    const permisos = this.authService.obtenerPermisos(); // o donde guardes los permisos del usuario
+    const permisos = this.authService.obtenerPermisos(); 
   
     this.puedeCrear = permisos.includes('Crear Usuarios');
     this.puedeEditar = permisos.includes('Editar Usuarios');

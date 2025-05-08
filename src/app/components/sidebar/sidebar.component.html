@@ -50,7 +50,7 @@
       <!-- Menú desplegable Ventas -->
       <li class="px-6 py-3 border-b border-[#B10303] flex items-center cursor-pointer" (click)="toggleDropdown('ventas')">
         <span class="mr-2"><i class="fas fa-clipboard-list"></i></span> VENTAS
-        <svg [class.rotate-180]="isDropdownOpen.inventario" class="ml-auto h-4 w-4 transition-transform" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+        <svg [class.rotate-180]="isDropdownOpen.ventas" class="ml-auto h-4 w-4 transition-transform" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
           <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
         </svg>
       </li>
@@ -75,7 +75,7 @@
           <!-- Menú desplegable Reportes -->
           <li class="px-6 py-3 border-b border-[#B10303] flex items-center cursor-pointer" (click)="toggleDropdown('reportes')">
             <span class="mr-2"><i class="fas fa-cogs"></i></span> REPORTES
-            <svg [class.rotate-180]="isDropdownOpen.administracion" class="ml-auto h-4 w-4 transition-transform" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <svg [class.rotate-180]="isDropdownOpen.reportes" class="ml-auto h-4 w-4 transition-transform" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
               <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
             </svg>
           </li>
@@ -100,7 +100,7 @@
       <!-- Icono de usuario -->
       <img [src]="currentUser.imagen "
       (error)="currentUser.imagen = currentUser"
-      class="h-6 w-6 rounded-full object-cover border mr-2"
+      class="h-8 w-8 rounded-full object-cover border mr-2"
       [alt]="'Foto de ' + currentUser.nombre">
 
       <!-- Información del usuario -->

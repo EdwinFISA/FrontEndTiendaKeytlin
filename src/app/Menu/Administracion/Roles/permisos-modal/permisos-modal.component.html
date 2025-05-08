@@ -36,20 +36,49 @@
             {{ contarSeleccionados() }} permisos seleccionados
         </div>
 
-        <!-- Lista de permisos -->
+        <!-- Lista de permisos agrupados por módulo -->
         <div class="flex-grow overflow-y-auto mb-4">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                <div *ngFor="let permiso of permisosFiltrados()" class="border rounded-md p-2 hover:bg-gray-50">
-                    <label class="flex items-center cursor-pointer">
-                        <input type="checkbox" [(ngModel)]="permisosSeleccionados[permiso.id]"
-                            class="form-checkbox h-5 w-5 text-blue-600">
-                        <span class="ml-2 text-sm">{{ permiso.nombre }}</span>
-                    </label>
-                </div>
-            </div>
-
+            <!-- Mostrar mensaje si no hay permisos que coincidan con el filtro -->
             <div *ngIf="permisosFiltrados().length === 0" class="text-center py-4 text-gray-500">
                 No se encontraron permisos con ese criterio de búsqueda
+            </div>
+
+            <!-- Lista de módulos agrupados -->
+            <div *ngFor="let modulo of permisosAgrupados | keyvalue" class="mb-3 border rounded-lg overflow-hidden">
+                <!-- Cabecera del módulo (colapsable) -->
+                <div class="bg-gray-100 p-3 flex justify-between items-center cursor-pointer" (click)="toggleModulo(modulo.key)">
+                    <div class="flex items-center">
+                        <span class="font-medium">{{ modulo.key }}</span>
+                        <span class="ml-2 text-sm text-gray-500">({{ modulo.value.length }} permisos)</span>
+                    </div>
+                    <div class="flex items-center">
+                        <!-- Selector de todos los permisos del módulo -->
+                        <div class="mr-4 flex items-center" (click)="$event.stopPropagation()">
+                            <input type="checkbox" 
+                                   [checked]="estaTodoElModuloSeleccionado(modulo.key)"
+                                   [indeterminate]="tieneSeleccionParcial(modulo.key)"
+                                   (change)="toggleSeleccionModulo(modulo.key, $event)"
+                                   class="form-checkbox h-5 w-5 text-blue-600">
+                            <span class="ml-1 text-sm">Todos</span>
+                        </div>
+                        <!-- Icono de flecha -->
+                        <i class="fas" [ngClass]="modulosExpandidos[modulo.key] ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                    </div>
+                </div>
+                
+                <!-- Contenido del módulo (permisos) -->
+                <div *ngIf="modulosExpandidos[modulo.key]" class="p-2 bg-white">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        <div *ngFor="let permiso of filtrarPermisosPorModulo(modulo.key)" class="border rounded-md p-2 hover:bg-gray-50">
+                            <label class="flex items-center cursor-pointer">
+                                <input type="checkbox" 
+                                       [(ngModel)]="permisosSeleccionados[permiso.id]"
+                                       class="form-checkbox h-5 w-5 text-blue-600">
+                                <span class="ml-2 text-sm">{{ obtenerNombreCortoPermiso(permiso.nombre) }}</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 

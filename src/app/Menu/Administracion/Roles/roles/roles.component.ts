@@ -235,6 +235,15 @@ export class RolesComponent implements OnInit {
 
   // Nueva función para abrir el modal de asignación de permisos
   asignarPermisos(rol: any): void {
+    if (rol.nombre?.toLowerCase() === 'admin') {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Acción no permitida',
+        text: 'No se pueden modificar los permisos del rol Admin.',
+        confirmButtonText: 'Entendido'
+      });
+      return; // 🚫 Detiene la ejecución antes de abrir el modal
+    }
     this.rolSeleccionado = { ...rol };
     this.mostrarModalPermisos = true;
   }
