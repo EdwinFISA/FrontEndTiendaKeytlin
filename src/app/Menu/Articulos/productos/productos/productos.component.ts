@@ -4,7 +4,7 @@ import Swal from 'sweetalert2';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ProductosModalComponent } from '../productos-modal/productos-modal.component';
-
+import { AuthService } from '../../../../services/auth.service';
 
 @Component({
   selector: 'app-productos',
@@ -30,12 +30,30 @@ export class ProductosComponent implements OnInit {
   paginaActual = 1;
   elementosPorPagina = 10;
 
-  constructor(private productoService: ProductoService) {}
+  //Variables de permisos
+  puedeCrear: boolean = false;
+  puedeEditar: boolean = false;
+  puedeEliminar: boolean = false;
+  puedeVer: boolean = false;
+
+  constructor(private productoService: ProductoService,
+              private authService: AuthService
+  ) {}
 
   ngOnInit(): void {
     this.cargarProductos();
+    this.cargarPermisos();
   }
 
+
+  cargarPermisos() {
+    const permisos = this.authService.obtenerPermisos(); 
+  
+    this.puedeCrear = permisos.includes('Crear Productos');
+    this.puedeEditar = permisos.includes('Editar Productos');
+    this.puedeEliminar = permisos.includes('Eliminar Productos');
+    this.puedeVer = permisos.includes('Ver Productos');
+  }
   cargarProductos() {
     this.productoService.obtenerProductos().subscribe({
       next: (data) => {

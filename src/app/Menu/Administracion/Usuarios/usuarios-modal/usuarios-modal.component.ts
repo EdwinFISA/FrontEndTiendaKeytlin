@@ -4,6 +4,7 @@ import { UsuarioService } from '../../../../services/usuario.service';
 import { finalize } from 'rxjs/operators';
 import { CommonModule, DOCUMENT } from '@angular/common';
 import { Inject } from '@angular/core';
+import Swal from 'sweetalert2';
 
 // Interfaces para tipado fuerte
 interface Usuario {
@@ -134,12 +135,17 @@ export class UsuarioModalComponent implements OnInit {
     return this.usuarioService.getImagenUrl(nombreImagen);
   }
 
-  convertirArchivoABase64(file: File): Promise<string | ArrayBuffer | null> {
+  convertirArchivoABase64(file: File): Promise<string | undefined> {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
   
       reader.onload = () => {
-        resolve(reader.result); // contiene la imagen como base64
+        const resultado = reader.result;
+        if (typeof resultado === 'string') {
+          resolve(resultado);
+        } else {
+          resolve(undefined); // Si no es string, devolvemos undefined
+        }
       };
   
       reader.onerror = error => {
@@ -153,29 +159,45 @@ export class UsuarioModalComponent implements OnInit {
 
   async onSubmit(): Promise<void> {
     if (this.cargando) return;
-
+  
     if (this.usuarioForm.invalid || !this.validarFormulario()) {
       this.marcarCamposComoTocados();
       return;
     }
-
+  
     this.cargando = true;
-    console.log(this.usuarioForm.value)
+  
     try {
-      let imagen = this.archivoImagen 
-      const base64 = await this.convertirArchivoABase64(imagen);
-        console.log(base64)
+      let base64: string | undefined = undefined;
+  
+      if (this.archivoImagen) {
+        base64 = await this.convertirArchivoABase64(this.archivoImagen);
+      }
+  
       const usuarioCompleto: Usuario = {
         ...this.usuario,
         Estado: this.estados.find(e => e.Id === this.usuario.EstadoId),
-        Imagen: base64?.toString(),
-        Rol: this.roles.find(r => r.Id === this.usuario.RolId)
+        Rol: this.roles.find(r => r.Id === this.usuario.RolId),
+        Imagen: base64 ?? this.usuario.Imagen
       };
-
+  
       this.guardar.emit(usuarioCompleto);
-    } catch (error) {
-      console.error('Error al guardar usuario:', error);
-      alert('Ocurrió un error al guardar el usuario. Intente nuevamente.');
+    } catch (error: any) {
+      this.cargando = false;
+      if (error.status === 400 && error.error?.errors) {
+        const errores = Object.values(error.error.errors).flat().join('\n');
+        Swal.fire({
+          icon: 'error',
+          title: 'Errores de validación',
+          text: errores
+        });
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Ocurrió un error al guardar el usuario. Intente nuevamente.'
+        });
+      }
     } finally {
       this.cargando = false;
     }
