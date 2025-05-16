@@ -4,26 +4,23 @@ import { CommonModule, DOCUMENT } from '@angular/common';
 import { ProductoService } from '../../../../services/productos.service';
 import { Categoria, CategoriaService } from '../../../../services/categoria.service';
 import { Proveedor, ProveedorService } from '../../../../services/proveedor.service';
+import Swal from 'sweetalert2';
 
 // Interfaces para tipado fuerte
 interface Producto {
-  Codigo?: number;
-  Marca?: string;
-  PrecioCompra: number | null;
-  PrecioVenta: number | null;
-  ProveedorId?: any;
-  Id?: number;
-  Nombre?: string;
-  Descripcion?: string;
-  Precio?: number;
-  Stock?: number;
-  CategoriaId?: number;
-  EstadoId?: number;
-  Imagen?: string;
-  Categoria?: any;
-  Estado?: any;
-//   categorias: Categoria[] = [];
-// proveedores: Proveedor[] = [];
+  id?: number;
+  nombre?: string;
+  descripcion?: string;
+  codigoProducto?: string; // ← cambiar de CodigoProducto
+  marcaProducto?: string;  // ← cambiar de MarcaProducto
+  precioAdquisicion: number | null;
+  precioVenta: number | null;
+  proveedorId?: number;
+  categoriaId?: number;
+  estadoId?: number;
+  imagen?: string;
+  categoria?: any;
+  proveedor?: any;
 }
 
 
@@ -37,9 +34,10 @@ interface Producto {
 
 export class ProductosModalComponent implements OnInit {
   @Input() producto: Producto = {
-    PrecioCompra: null,
-    PrecioVenta: null
+    precioAdquisicion: null,
+    precioVenta: null
   };
+  
   @Input() modoVista: boolean = false;
   @Output() cerrar = new EventEmitter<void>();
   @Output() guardar = new EventEmitter<Producto>();
@@ -63,68 +61,44 @@ export class ProductosModalComponent implements OnInit {
 
   ngOnInit(): void {
   
-    this.cargarDatos(); // Esta ya carga categorías, proveedores y estados
+    this.cargarDatos(); 
   
-    if (this.producto.Imagen) {
-      this.imagenPrevia = this.getImagenUrl(this.producto.Imagen);
+    if (this.producto.imagen) {
+      this.imagenPrevia = this.getImagenUrl(this.producto.imagen);
     }
   }
-  
+ 
   cargarDatos(): void {
     this.productoService.obtenerCategorias().subscribe(categorias => {
       console.log('Categorías cargadas:', categorias);
       this.categorias = categorias;
-      if (!this.producto.Id) {
+      if (!this.producto.id) {
         const porDefecto = categorias.find(c => c.categoriaNombre?.toLowerCase() === 'general');
-        if (porDefecto) this.producto.CategoriaId = porDefecto.id;
+        if (porDefecto) this.producto.categoriaId = porDefecto.id;
       }
     });
   
     this.productoService.obtenerProveedores().subscribe(proveedores => {
       this.proveedores = proveedores;
-      if (!this.producto.Id && proveedores.length > 0) {
-        this.producto.ProveedorId = proveedores[0].id;
-      }
-    });
-  
-    // this.productoService.obtenerEstados().subscribe(estados => {
-    //   this.estados = estados;
-    //   if (!this.producto.Id) {
-    //     const estadoActivo = estados.find(e => e.Nombre?.toLowerCase() === 'activo');
-    //     if (estadoActivo) this.producto.EstadoId = estadoActivo.Id;
-    //   }
-    // 
-    // });
-  }  
-  
-
-  
-
-  /*ngOnInit(): void {
-    this.cargarDatos();
-
-    if (this.producto.Imagen) {
-      this.imagenPrevia = this.getImagenUrl(this.producto.Imagen);
-    }
-  }*/
-
-  /*cargarDatos(): void {
-    this.productoService.obtenerCategorias().subscribe(categorias => {
-      this.categorias = categorias;
-      if (!this.producto.Id) {
-        const catPorDefecto = categorias.find(c => c.Nombre?.toLowerCase() === 'general');
-        if (catPorDefecto) this.producto.CategoriaId = catPorDefecto.Id;
+      if (!this.producto.id && proveedores.length > 0) {
+        this.producto.proveedorId = proveedores[0].id;
       }
     });
 
     this.productoService.obtenerEstados().subscribe(estados => {
+      console.log('Estados recibidos en modal:', estados);
       this.estados = estados;
-      if (!this.producto.Id) {
+      if (!this.producto.id && estados.length > 0) {
         const estadoActivo = estados.find(e => e.Nombre?.toLowerCase() === 'activo');
-        if (estadoActivo) this.producto.EstadoId = estadoActivo.Id;
+        if (estadoActivo) {
+          this.producto.estadoId = estadoActivo.Id;
+          console.log('Estado por defecto establecido:', estadoActivo);
+        }
       }
     });
-  }*/
+  
+  }  
+  
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -143,7 +117,7 @@ export class ProductosModalComponent implements OnInit {
     }
 
     this.archivoImagen = file;
-    this.producto.Imagen = file.name;
+    this.producto.imagen = file.name;
 
     const reader = new FileReader();
     reader.onload = () => {
@@ -160,54 +134,97 @@ export class ProductosModalComponent implements OnInit {
     return this.productoService.getImagenUrl(nombreImagen);
   }
 
-  async onSubmit(): Promise<void> {
-    if (this.cargando) return;
+    convertirArchivoABase64(file: File): Promise<string | undefined> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+  
+      reader.onload = () => {
+        const resultado = reader.result;
+        if (typeof resultado === 'string') {
+          resolve(resultado);
+        } else {
+          resolve(undefined); // Si no es string, devolvemos undefined
+        }
+      };
+  
+      reader.onerror = error => {
+        reject(error);
+      };
+  
+      reader.readAsDataURL(file);
+    });
+  }
 
-    // if (this.productoForm.invalid || !this.validarFormulario()) {
-    //   this.marcarCamposComoTocados();
-    //   return;
-    // }
+async onSubmit(): Promise<void> {
+  if (this.cargando) return;
 
-    this.cargando = true;
+  if (this.productoForm.invalid || !this.validarFormulario()) {
+    this.marcarCamposComoTocados();
+    return;
+  }
 
-    try {
+  this.cargando = true;
+
+  try {
+    let base64: string | undefined = undefined;
+  
       if (this.archivoImagen) {
-        const nombreImagen = await this.productoService.subirImagen(this.archivoImagen).toPromise();
-        this.producto.Imagen = nombreImagen;
+        base64 = await this.convertirArchivoABase64(this.archivoImagen);
       }
 
-      const productoCompleto: Producto = {
-        ...this.producto,
-        Categoria: this.categorias.find(c => c.id === this.producto.CategoriaId),
-        Estado: this.estados.find(e => e.Id === this.producto.EstadoId)
-      };
+    const productoCompleto: Producto = {
+      ...this.producto,
+      categoria: this.categorias.find(c => c.id === this.producto.categoriaId),
+      proveedor: this.proveedores.find(p => p.id === this.producto.proveedorId),
+      imagen: base64 ?? this.producto.imagen
+    };
 
-      this.guardar.emit(productoCompleto);
-    } catch (error) {
-      console.error('Error al guardar producto:', error);
-      alert('Ocurrió un error al guardar el producto. Intente nuevamente.');
-    } finally {
-      this.cargando = false;
+    this.guardar.emit(productoCompleto);
+
+  } catch (error: any) {
+    console.error('Error al guardar producto:', error);
+
+    if (error.status === 400 && error.error?.errors) {
+      const errores = Object.values(error.error.errors).flat().join('\n');
+      Swal.fire({
+        icon: 'error',
+        title: 'Errores de validación',
+        text: errores
+      });
+    } else {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Ocurrió un error al guardar el producto. Intente nuevamente.'
+      });
+    }
+
+  } finally {
+    this.cargando = false;
+  }
+}
+
+
+private validarFormulario(): boolean {
+  const camposRequeridos = [
+    { campo: this.producto.nombre?.trim(), mensaje: 'El nombre del producto es requerido' },
+    { campo: this.producto.codigoProducto, mensaje: 'El código del producto es requerido' },
+    { campo: this.producto.precioAdquisicion, mensaje: 'El precio de adquisición es requerido' },
+    { campo: this.producto.precioVenta, mensaje: 'El precio de venta es requerido' },
+    { campo: this.producto.categoriaId, mensaje: 'La categoría es requerida' },
+    { campo: this.producto.proveedorId, mensaje: 'El proveedor es requerido' }
+  ];
+
+  for (const { campo, mensaje } of camposRequeridos) {
+    if (campo === null || campo === undefined || campo === '' || (typeof campo === 'number' && isNaN(campo))) {
+      alert(mensaje);
+      return false; // ← Retorna `false` si algún campo es inválido
     }
   }
 
-  // private validarFormulario(): boolean {
-  //   // const camposRequeridos = [
-  //   //   // { campo: this.producto.Nombre?.trim(), mensaje: 'El nombre es requerido' },
-  //   //   // { campo: this.producto.Precio, mensaje: 'El precio es requerido' },
-  //   //   // { campo: this.producto.Stock, mensaje: 'El stock es requerido' }
-  //   // ];
+  return true; // ← Retorna `true` si todos los campos son válidos
+}
 
-  //   for (const { campo, mensaje } of camposRequeridos) {
-  //     if (campo === undefined || campo === null || campo === '') {
-  //       alert(mensaje);
-  //       return false;
-  //     }
-  //   }
-
-  //   return true;
-  // }
-  
 
   private marcarCamposComoTocados(): void {
     if (!this.productoForm?.controls) return;

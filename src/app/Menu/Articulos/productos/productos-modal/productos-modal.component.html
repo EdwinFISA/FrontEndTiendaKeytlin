@@ -5,7 +5,7 @@
       <span class="absolute top-0 right-0 p-4 cursor-pointer" (click)="cerrarModal()">&times;</span>
 
       <h2 class="text-2xl font-bold mb-4 border-b pb-2 text-left">
-        {{ modoVista ? 'Detalles del producto' : producto.Id ? 'Editar producto' : 'Agregar producto' }}
+        {{ modoVista ? 'Detalles del producto' : producto.id ? 'Editar producto' : 'Agregar producto' }}
       </h2>
 
       <form (ngSubmit)="!modoVista && onSubmit()" #productoForm="ngForm" novalidate>
@@ -22,7 +22,7 @@
                 id="nombre"
                 name="nombre"
                 maxlength="100"
-                [(ngModel)]="producto.Nombre"
+                [(ngModel)]="producto.nombre"
                 #nombre="ngModel"
                 required
                 [class.bg-gray-100]="modoVista"
@@ -45,7 +45,7 @@
                 id="codigo"
                 name="codigo"
                 maxlength="100"
-                [(ngModel)]="producto.Codigo"
+                [(ngModel)]="producto.codigoProducto"
                 #codigo="ngModel"
                 required
                 [class.bg-gray-100]="modoVista"
@@ -68,7 +68,7 @@
                 id="marca"
                 name="marca"
                 maxlength="100"
-                [(ngModel)]="producto.Marca"
+                [(ngModel)]="producto.marcaProducto"
                 #marca="ngModel"
                 [class.bg-gray-100]="modoVista"
                 class="rounded w-full py-2 px-3 focus:outline-none focus:ring-1"
@@ -90,9 +90,9 @@
                 name="precioCompra"
                 min="0.01"
                 step="0.01"
-                [(ngModel)]="producto.PrecioCompra"
+                [(ngModel)]="producto.precioAdquisicion"
                 #precioCompra="ngModel"
-                
+                required
                 [class.bg-gray-100]="modoVista"
                 class="rounded w-full py-2 px-3 focus:outline-none focus:ring-1"
                 style="border: 1px solid #070826; color: #670305;"
@@ -114,9 +114,9 @@
                 name="precioVenta"
                 min="0.01"
                 step="0.01"
-                [(ngModel)]="producto.PrecioVenta"
+                [(ngModel)]="producto.precioVenta"
                 #precioVenta="ngModel"
-                
+                required
                 [class.bg-gray-100]="modoVista"
                 class="rounded w-full py-2 px-3 focus:outline-none focus:ring-1"
                 style="border: 1px solid #070826; color: #670305;"
@@ -127,29 +127,33 @@
               </div>
             </div>
 
-            <!-- Stock -->
-            <div class="mb-4">
-              <label for="stock" class="block text-sm font-medium mb-1 text-left" style="color: #670305;">
-                Stock <span style="color: #670305;">*</span>
-              </label>
-              <input
-                type="number"
-                id="stock"
-                name="stock"
-                min="0"
-                step="1"
-                [(ngModel)]="producto.Stock"
-                #stock="ngModel"
-                required
-                [class.bg-gray-100]="modoVista"
-                class="rounded w-full py-2 px-3 focus:outline-none focus:ring-1"
-                style="border: 1px solid #070826; color: #670305;"
-              />
-              <div *ngIf="stock.invalid && (stock.dirty || stock.touched)" class="text-red-500 text-sm mt-1">
-                <div *ngIf="stock.errors?.['required']">El stock es obligatorio.</div>
-                <div *ngIf="stock.errors?.['min']">Debe ser 0 o mayor.</div>
+
+              <!-- Estado -->
+          <div class="mb-4">
+            <label for="estado" class="block text-sm font-medium mb-1 text-left" style="color: #670305;">
+              Estado<span class="text-red-600">*</span>
+            </label>
+            <div class="relative">
+              <select id="estado"
+                      [(ngModel)]="producto.estadoId"
+                      name="estado"
+                      
+                      class="border rounded w-full py-2 px-3 text-gray-700 focus:outline-none focus:ring-1 appearance-none"
+                      style="border: 1px solid #070826; color: #670305;">
+                <option value="">Seleccione un estado</option>
+                <option *ngFor="let estado of estados"
+                        [ngValue]="estado.Id || estado.id">
+                  {{estado.Nombre || estado.nombre}}
+                </option>
+              </select>
+              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                  <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                </svg>
               </div>
             </div>
+          </div>
+
 
             <!-- Categoría -->
             <div class="mb-4">
@@ -159,7 +163,7 @@
               <select
                 id="categoria"
                 name="categoria"
-                [(ngModel)]="producto.CategoriaId"
+                [(ngModel)]="producto.categoriaId"
                 required
                 [class.bg-gray-100]="modoVista"
                 class="rounded w-full py-2 px-3 focus:outline-none focus:ring-1"
@@ -178,7 +182,7 @@
               <select
                 id="proveedor"
                 name="proveedor"
-                [(ngModel)]="producto.ProveedorId"
+                [(ngModel)]="producto.proveedorId"
                 required
                 [class.bg-gray-100]="modoVista"
                 class="rounded w-full py-2 px-3 focus:outline-none focus:ring-1"
@@ -199,32 +203,36 @@
                 name="descripcion"
                 maxlength="500"
                 rows="3"
-                [(ngModel)]="producto.Descripcion"
+                [(ngModel)]="producto.descripcion"
                 [class.bg-gray-100]="modoVista"
                 class="rounded w-full py-2 px-3 focus:outline-none focus:ring-1 resize-none"
                 style="border: 1px solid #070826; color: #670305;"></textarea>
             </div>
 
             <!-- Imagen -->
-            <div class="mb-4 md:col-span-3">
-              <label class="block text-sm font-medium mb-1 text-left">
-                Imagen del producto
-              </label>
-              <div class="mb-3" *ngIf="imagenPrevia">
-                <img [src]="imagenPrevia" alt="Vista previa de imagen"
-                  class="h-24 w-24 object-cover rounded-lg border border-gray-200">
-              </div>
-              <div class="flex items-center" *ngIf="!modoVista">
-                <input type="file" id="fileInput" accept="image/jpeg, image/png" (change)="onFileSelected($event)" class="hidden">
-                <button type="button" (click)="onFileInputClick()" [disabled]="cargando"
-                  class="bg-[#011552] hover:bg-[#002a7a] text-white font-medium py-2 px-4 rounded transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
-                  <i class="fas fa-upload mr-2"></i>
-                  <span *ngIf="!cargando">Seleccionar imagen</span>
-                  <span *ngIf="cargando">Cargando...</span>
-                </button>
-              </div>
-              <p class="text-xs text-gray-500 mt-1">Formatos aceptados: JPG, PNG (Máx. 2MB)</p>
+          <div class="mb-4 md:col-span-3">
+            <label class="block text-sm font-medium mb-1 text-left">
+              Imagen del producto
+            </label>
+            <div class="mb-3" *ngIf="imagenPrevia">
+              <img [src]="imagenPrevia" alt="Vista previa de imagen"
+                class="h-24 w-24 object-cover rounded-lg border border-gray-200">
             </div>
+            <div class="flex items-center" *ngIf="!modoVista">
+              <input type="file" id="fileInput" accept="image/jpeg, image/png" (change)="onFileSelected($event)"
+                class="hidden">
+              <button type="button" (click)="onFileInputClick()" [disabled]="cargando"
+                class="bg-[#011552] hover:bg-[#002a7a] text-white font-medium py-2 px-4 rounded transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                <i class="fas fa-upload mr-2"></i>
+                <span *ngIf="!cargando">Seleccionar imagen</span>
+                <span *ngIf="cargando">Cargando...</span>
+              </button>
+              <!-- <span class="ml-3 text-sm text-gray-600" *ngIf="usuario.Imagen">
+                {{ usuario.Imagen }}
+              </span> -->
+            </div>
+            <p class="text-xs text-gray-500 mt-1">Formatos aceptados: JPG, PNG (Máx. 2MB)</p>
+          </div>
           </div>
         </fieldset>
 

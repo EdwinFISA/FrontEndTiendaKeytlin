@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ProductoService } from '../../../../services/productos.service';
 import Swal from 'sweetalert2';
 import { FormsModule } from '@angular/forms';
@@ -13,13 +13,13 @@ import { AuthService } from '../../../../services/auth.service';
   styleUrl: './productos.component.css',
   imports: [FormsModule, CommonModule, ProductosModalComponent]
 })
-
 export class ProductosComponent implements OnInit {
   productos: any[] = [];
   originalProducto: any[] = [];
   mostrarModal = false;
   productoSeleccionado: any = null;
   modoVista = false;
+  @ViewChild(ProductosModalComponent) productoModalComponent!: ProductosModalComponent;
 
   // Filtros
   filtroProducto = '';
@@ -30,14 +30,15 @@ export class ProductosComponent implements OnInit {
   paginaActual = 1;
   elementosPorPagina = 10;
 
-  //Variables de permisos
-  puedeCrear: boolean = false;
-  puedeEditar: boolean = false;
-  puedeEliminar: boolean = false;
-  puedeVer: boolean = false;
+  // Permisos
+  puedeCrear = false;
+  puedeEditar = false;
+  puedeEliminar = false;
+  puedeVer = false;
 
-  constructor(private productoService: ProductoService,
-              private authService: AuthService
+  constructor(
+    private productoService: ProductoService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -45,15 +46,14 @@ export class ProductosComponent implements OnInit {
     this.cargarPermisos();
   }
 
-
   cargarPermisos() {
-    const permisos = this.authService.obtenerPermisos(); 
-  
+    const permisos = this.authService.obtenerPermisos();
     this.puedeCrear = permisos.includes('Crear Productos');
     this.puedeEditar = permisos.includes('Editar Productos');
     this.puedeEliminar = permisos.includes('Eliminar Productos');
     this.puedeVer = permisos.includes('Ver Productos');
   }
+
   cargarProductos() {
     this.productoService.obtenerProductos().subscribe({
       next: (data) => {
@@ -79,7 +79,7 @@ export class ProductosComponent implements OnInit {
     const filtro = this.filtroProducto.toLowerCase();
     this.productos = this.originalProducto.filter(p =>
       p.nombre.toLowerCase().includes(filtro) ||
-      p.codigo.toLowerCase().includes(filtro)
+      p.codigoProducto.toLowerCase().includes(filtro)
     );
   }
 
@@ -138,7 +138,7 @@ export class ProductosComponent implements OnInit {
     this.productoSeleccionado = {
       id: 0,
       nombre: '',
-      codigo: '',
+      codigoProducto: '',
       estado: 'Activo',
       precioAdquisicion: 0,
       precioVenta: 0,
@@ -150,33 +150,108 @@ export class ProductosComponent implements OnInit {
   }
 
   abrirModalEditar(producto: any) {
-    this.productoSeleccionado = { ...producto };
-    this.modoVista = false;
+    this.productoSeleccionado = {
+      id: producto.id || producto.Id,
+      nombre: producto.nombre || producto.Nombre,
+      codigoProducto: producto.codigoProducto || producto.CodigoProducto,
+      marca: producto.marca || producto.Marca,
+      descripcion: producto.descripcion || producto.Descripcion,
+      precioAdquisicion: producto.precioAdquisicion || producto.PrecioAdquisicion,
+      precioVenta: producto.precioVenta || producto.PrecioVenta,
+      stock: producto.stock || producto.Stock,
+      categoriaId: producto.categoriaId || producto.CategoriaId,
+      proveedorId: producto.proveedorId || producto.ProveedorId,
+      imagen: producto.imagen || producto.Imagen,
+      estado: producto.estado ?? producto.Estado,
+    };
+
     this.mostrarModal = true;
+    this.modoVista = false;
+
+    setTimeout(() => {
+      if (this.productoSeleccionado.imagen) {
+        const imagen = this.productoSeleccionado.imagen;
+        this.productoModalComponent.imagenPrevia = imagen.startsWith('data:image')
+          ? imagen
+          : this.productoService.getImagenUrl(imagen);
+      }
+    });
   }
 
   verProducto(producto: any) {
-    this.productoSeleccionado = { ...producto };
+    this.productoSeleccionado = {
+      id: producto.id || producto.Id,
+      nombre: producto.nombre || producto.Nombre,
+      codigoProducto: producto.codigoProducto || producto.CodigoProducto,
+      marca: producto.marca || producto.Marca,
+      descripcion: producto.descripcion || producto.Descripcion,
+      precioAdquisicion: producto.precioAdquisicion || producto.PrecioAdquisicion,
+      precioVenta: producto.precioVenta || producto.PrecioVenta,
+      stock: producto.stock || producto.Stock,
+      categoriaId: producto.categoriaId || producto.CategoriaId,
+      proveedorId: producto.proveedorId || producto.ProveedorId,
+      imagen: producto.imagen || producto.Imagen,
+      estado: producto.estado ?? producto.Estado,
+    };
+
     this.modoVista = true;
     this.mostrarModal = true;
+
+    setTimeout(() => {
+      if (this.productoSeleccionado.imagen) {
+        const imagen = this.productoSeleccionado.imagen;
+        this.productoModalComponent.imagenPrevia = imagen.startsWith('data:image')
+          ? imagen
+          : this.productoService.getImagenUrl(imagen);
+      }
+    });
   }
 
   guardarProducto(producto: any) {
-    this.productoService.guardarProducto(producto).subscribe({
+    const codigoExistente = this.originalProducto.find(p =>
+      p.codigoProducto.toLowerCase() === producto.codigoProducto.toLowerCase() &&
+      p.id !== this.productoSeleccionado?.id
+    );
+
+    if (codigoExistente) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Código duplicado',
+        text: `Ya existe un producto con el código "${producto.codigoProducto}".`
+      });
+      return;
+    }
+
+    const productoParaGuardar = {
+      ...producto,
+      id: this.productoSeleccionado?.id || 0,
+      estadoId: producto.estadoId ?? true
+    };
+
+    console.log('Producto a enviar:', JSON.stringify(productoParaGuardar, null, 2));
+
+    this.productoService.guardarProducto(productoParaGuardar).subscribe({
       next: () => {
         this.cargarProductos();
         this.cerrarModal();
         Swal.fire({
           icon: 'success',
-          title: producto.id === 0 ? 'Producto creado' : 'Producto actualizado',
+          title: productoParaGuardar.id === 0 ? 'Producto creado' : 'Producto actualizado',
           text: 'La operación se ha realizado correctamente.'
         });
       },
       error: (error) => {
+        console.error('Error al guardar producto:', error);
+        let mensajeError = 'Error al guardar producto.';
+        if (error.error?.errors) {
+          mensajeError = Object.entries(error.error.errors)
+            .map(([key, val]) => `${key}: ${Array.isArray(val) ? val.join(', ') : val}`)
+            .join('\n');
+        }
         Swal.fire({
           icon: 'error',
           title: 'Error',
-          text: 'Hubo un problema al guardar el producto.'
+          text: mensajeError
         });
       }
     });
@@ -201,7 +276,7 @@ export class ProductosComponent implements OnInit {
               text: 'El producto ha sido desactivado correctamente.'
             });
           },
-          error: (error) => {
+          error: () => {
             Swal.fire({
               icon: 'error',
               title: 'Error',
@@ -218,6 +293,5 @@ export class ProductosComponent implements OnInit {
     this.productoSeleccionado = null;
   }
 }
-
 
  

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpEvent, HttpEventType } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { Categoria } from './categoria.service';
 import { Proveedor } from './proveedor.service';
@@ -10,6 +10,9 @@ import { Proveedor } from './proveedor.service';
   providedIn: 'root'
 })
 export class ProductoService {
+  private readonly apiBaseUrl = `${environment.apiUrl}/api/producto`;
+  private readonly apiUrl = `${environment.apiUrl}/api/Producto`;
+
   obtenerCategorias(): Observable<Categoria[]> {
     return this.http.get<Categoria[]>(`${environment.apiUrl}/api/categorias`);
   }
@@ -23,9 +26,11 @@ export class ProductoService {
   }
   
 
-  private readonly apiUrl = `${environment.apiUrl}/api/Producto`;
-
   constructor(private http: HttpClient) { }
+  // Método para obtener URL de imágenes
+  public getImagenUrl(nombreImagen: string): string {
+    return `${this.apiBaseUrl}/imagenes/${nombreImagen}`;
+  }
 
   // Obtener todos los productos
   obtenerProductos(): Observable<any[]> {
@@ -64,23 +69,13 @@ export class ProductoService {
     );
   }
 
-  // Subir imagen de producto
-  subirImagen(archivo: File): Observable<any> {
+
+    // Subir imagen de producto
+  subirImagen(archivo: File): Observable<string> {
     const formData = new FormData();
     formData.append('archivo', archivo);
-    return this.http.post(`${this.apiUrl}/subir-imagen`, formData, {
-      reportProgress: true,
-      observe: 'body'
-    }).pipe(
-      catchError(this.handleError)
-    );
+    return this.http.post<string>('https://localhost:56232/api/productos/subir-imagen', formData);
   }
-
-  // Obtener URL de la imagen
-  public getImagenUrl(nombreImagen: string): string {
-    return `${this.apiUrl}/imagenes/${nombreImagen}`;
-  }
-
   
 
   // Manejo de errores
