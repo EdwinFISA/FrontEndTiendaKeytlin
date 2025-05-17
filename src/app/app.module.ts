@@ -55,14 +55,14 @@ export function tokenGetter() {
     AperturaCajaComponent,
     CierreCajaComponent,
     StockComponent,
-    PedidosComponent,
+    
     VentasComponent,
     HistorialComponent,
     ReporteUsuarioComponent,
     ReporteVentaComponent,
     ReportePedidosComponent,
     ReporteInventarioComponent,
-    PedidosModalComponent,
+    
     DetalleVentasComponent,
     ReciboVentasComponent,
     RolesComponent,
@@ -72,6 +72,8 @@ export function tokenGetter() {
     AccessoDenegadoComponent,
   ],
   imports: [
+    PedidosModalComponent,
+    PedidosComponent,
     BrowserModule,
     UsuariosComponent,
     UsuarioModalComponent,

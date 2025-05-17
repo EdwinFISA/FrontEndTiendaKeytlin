@@ -1,1 +1,57 @@
-<p>reporte-venta works!</p>
+<div class="p-6">
+    <!-- Filtros -->
+    <div class="flex flex-wrap gap-4 mb-6">
+        <input type="text" placeholder="Buscar usuario" class="border p-2 rounded w-48" />
+        <input type="date" class="border p-2 rounded w-40" />
+        <input type="date" class="border p-2 rounded w-40" />
+        <button class="bg-blue-900 text-white px-4 py-2 rounded">Generar</button>
+    </div>
+
+    <!-- Encabezado de reporte -->
+    <div class="border-4 border-blue-900 p-6 text-center">
+        <h1 class="text-2xl font-bold text-red-800 mb-4">REPORTE DE VENTAS</h1>
+        <div class="flex justify-between text-left text-sm">
+            <div>
+                <p><strong>Teléfono:</strong></p>
+                <p><strong>Email:</strong></p>
+                <p><strong>Dirección:</strong></p>
+            </div>
+
+            <div class="flex justify-center mb-4">
+                <img src="src\assets\images\Logo.png" alt="Logo Tienda Keytelin" class="h-20" />
+            </div>
+
+            <div>
+                <p><strong>Mes:</strong></p>
+                <p><strong>Fecha y hora de emisión:</strong></p>
+                <p><strong>Realizado por:</strong></p>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Tabla de usuarios -->
+    <table class="w-full mt-6 table-auto border-t">
+        <thead class="bg-gray-100 text-left">
+            <tr>
+                <th class="p-2">ID</th>
+                <th class="p-2">Total</th>
+                <th class="p-2">ID Usuario</th>
+                <th class="p-2">Fecha de Venta</th>
+                <th class="p-2">Total de Productos</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Aquí se iterarán los usuarios con *ngFor -->
+        </tbody>
+    </table>
+
+    <!-- Botón exportar -->
+    <div class="mt-4 text-right">
+        <button class="bg-red-600 text-white px-4 py-2 rounded">Exportar PDF</button>
+    </div>
+
+    <div class="mt-4 text-right">
+        <button class="bg-red-600 text-white px-4 py-2 rounded">Buscar Reporte</button>
+    </div>
+</div>

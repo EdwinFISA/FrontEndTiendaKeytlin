@@ -1,1 +1,69 @@
-<p>detalle-ventas works!</p>
+
+<div class="relative p-6 border-2 border-red-600 rounded-3xl max-w-md mx-auto bg-white shadow-lg">
+    <!-- Botón de cerrar -->
+    <button (click)="cancelar()" class="absolute top-3 right-3 text-red-600 hover:text-red-800">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+    </button>
+
+    <!-- Título -->
+    <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">Detalles de la Venta</h2>
+
+    <!-- Total de venta -->
+    <p class="text-center text-lg text-blue-900 font-medium mb-6">
+        Total de venta: Q. {{ total | number:'1.1-2' }}
+    </p>
+
+    <form [formGroup]="detalleForm" class="space-y-4">
+        <!-- Subtotal -->
+        <div class="flex justify-between items-center text-sm text-gray-700">
+            <span class="font-medium">Subtotal:</span>
+            <span>Q. {{ subtotal | number:'1.2-2' }}</span>
+        </div>
+
+        <!-- Total -->
+        <div class="flex justify-between items-center text-sm font-semibold text-red-700 border-b pb-2">
+            <span>Total:</span>
+            <span>Q. {{ total | number:'1.2-2' }}</span>
+        </div>
+
+        <!-- Monto Recibido -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Monto recibido:</label>
+            <input type="number" formControlName="montoRecibido"
+                class="w-full border border-blue-800 rounded-md p-2 text-right text-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
+                required />
+            <div *ngIf="detalleForm.get('montoRecibido')?.invalid && (detalleForm.get('montoRecibido')?.dirty || detalleForm.get('montoRecibido')?.touched)"
+                class="text-red-500 text-xs mt-1">
+                <div *ngIf="detalleForm.get('montoRecibido')?.errors?.['required']">
+                    El monto recibido es obligatorio
+                </div>
+                <div *ngIf="detalleForm.get('montoRecibido')?.value < total">
+                    El monto debe ser igual o mayor al total
+                </div>
+            </div>
+        </div>
+
+        <!-- Cambio -->
+        <div class="flex justify-between items-center text-sm text-gray-700">
+            <span class="font-medium">Cambio:</span>
+            <span>Q. {{ detalleForm.get('cambio')?.value | number:'1.2-2' }}</span>
+        </div>
+
+        <!-- Observaciones ocultas -->
+        <textarea formControlName="observaciones" rows="3" class="hidden"></textarea>
+
+        <!-- Botón de Confirmar -->
+        <div class="flex justify-center mt-6">
+            <button (click)="confirmar()"
+                [disabled]="detalleForm.invalid || detalleForm.get('montoRecibido')?.value < total"
+                class="px-4 py-2 border border-transparent rounded-md shadow-sm text-white bg-[#070826] hover:bg-[#05061c] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed">
+                Confirmar Venta
+            </button>
+        </div>
+
+        <!-- Botón de cancelar oculto -->
+        <button (click)="cancelar()" class="hidden">Cancelar</button>
+    </form>
+</div>

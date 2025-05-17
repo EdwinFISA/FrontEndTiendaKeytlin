@@ -19,6 +19,9 @@ export interface Proveedor {
   providedIn: 'root',
 })
 export class ProveedorService {
+  obtenerProveedores() {
+    throw new Error('Method not implemented.');
+  }
   private apiUrl = `${environment.apiUrl}/api/proveedores`;
 
   constructor(private http: HttpClient) { }

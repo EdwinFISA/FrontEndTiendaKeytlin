@@ -7,5 +7,13 @@ import { Component } from '@angular/core';
   styleUrl: './reporte-inventario.component.css'
 })
 export class ReporteInventarioComponent {
+  inventario = []; // Aquí se carga la lista de usuarios
 
+  generarReporte() {
+    // Filtrar o cargar Inventario
+  }
+
+  exportarPDF() {
+    // Usar html2pdf o jspdf para exportar
+  }
 }
