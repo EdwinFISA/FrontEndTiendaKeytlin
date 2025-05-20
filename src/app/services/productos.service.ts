@@ -6,6 +6,8 @@ import { environment } from '../../environments/environment';
 import { Categoria } from './categoria.service';
 import { Proveedor } from './proveedor.service';
 
+export interface Producto {}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -96,3 +98,5 @@ export class ProductoService {
     return throwError(() => new Error(mensajeError));
   }
 }
+
+

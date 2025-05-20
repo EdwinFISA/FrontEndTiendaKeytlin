@@ -55,14 +55,12 @@ export function tokenGetter() {
     AperturaCajaComponent,
     CierreCajaComponent,
     StockComponent,
-    
     VentasComponent,
     HistorialComponent,
     ReporteUsuarioComponent,
     ReporteVentaComponent,
     ReportePedidosComponent,
     ReporteInventarioComponent,
-    
     DetalleVentasComponent,
     ReciboVentasComponent,
     RolesComponent,
