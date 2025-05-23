@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { ProductoService } from '../../../../services/productos.service';
+import { ProductosService } from '../../../../services/stock.service';
 import { VentaService } from '../../../../services/ventas.service';
 import Swal from 'sweetalert2';
 import { DetalleVentasComponent } from '../detalle-ventas/detalle-ventas.component';
@@ -40,7 +40,7 @@ export class VentasComponent implements OnInit {
   datosRecibo: ReciboVentaData | null = null;
 
   constructor(
-    private productoService: ProductoService,
+    private stockService: ProductosService,
     private ventaService: VentaService
   ) {}
 
@@ -48,28 +48,31 @@ export class VentasComponent implements OnInit {
     this.cargarProductos();
   }
 
+
+
   cargarProductos(): void {
-    this.productoService.obtenerProductos().subscribe({
-      next: (data) => {
-        this.productos = data.map(p => ({
-          id: p.id,
-          nombre: p.nombre,
-          codigo: p.codigoProducto,
-          precio: p.precioVenta,
-          disponibles: 50,
-          imagen: p.imagen || 'assets/no-image.png'
-        }));
-        this.actualizarProductosFiltrados();
-      },
-      error: () => {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'Error al cargar productos'
-        });
-      }
-    });
-  }
+  this.stockService.obtenerStockProductos().subscribe({
+    next: (data) => {
+      this.productos = data.map(p => ({
+        id: p.productoId,
+        nombre: p.nombre,
+        codigo: p.codigoProducto,
+        precio: p.precioVenta,
+        disponibles: p.stockDisponible,
+        imagen: p.imagen || 'assets/no-image.png'
+      }));
+      this.actualizarProductosFiltrados();
+    },
+    error: () => {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Error al cargar productos con stock'
+      });
+    }
+  });
+}
+
 
   actualizarProductosFiltrados(): void {
     const filtro = this.buscarProducto.trim().toLowerCase();

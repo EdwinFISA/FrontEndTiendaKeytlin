@@ -57,8 +57,12 @@ export class PedidosComponent implements OnInit {
   cargarPedidos() {
     this.pedidoService.obtenerPedidos().subscribe({
       next: (data) => {
-        this.originalPedidos = data;
-        this.pedidos = [...data];
+        console.log('Datos recibidos del backend:', data);
+        this.originalPedidos = data.map(pedido => this.normalizarPedido(pedido));
+        this.pedidos = [...this.originalPedidos];
+        
+        // Cargar nombres de productos faltantes
+        this.cargarNombresProductosFaltantes();
       },
       error: (error) => {
         Swal.fire({
@@ -70,6 +74,115 @@ export class PedidosComponent implements OnInit {
     });
   }
 
+  private cargarNombresProductosFaltantes(): void {
+    // Obtener todos los productos para llenar los nombres faltantes
+    this.pedidoService.obtenerProductos?.()?.subscribe?.({
+      next: (productos) => {
+        this.originalPedidos.forEach(pedido => {
+          if (pedido.detalles && pedido.detalles.length > 0) {
+            pedido.detalles.forEach((detalle: any) => {
+              if (!detalle.nombreProducto && detalle.productoId) {
+                const producto = productos.find((p: any) => p.id === detalle.productoId);
+                if (producto) {
+                  detalle.nombreProducto = pedido.nombre;
+                  detalle.producto = {
+                    id: pedido.id,
+                    nombre: pedido.nombre
+                  };
+                }
+              }
+            });
+          }
+        });
+        
+        // Actualizar la lista filtrada también
+        this.pedidos = [...this.originalPedidos];
+      },
+      error: (error) => {
+        console.warn('No se pudieron cargar los productos:', error);
+        // Si el servicio de pedidos no tiene obtenerProductos, intentar con el servicio de productos
+        // Esto requeriría inyectar ProductoService, pero por ahora dejamos el warning
+      }
+    });
+  }
+
+  private normalizarPedido(pedido: any): any {
+    console.log('Pedido crudo recibido:', pedido);
+    
+    // Normalizar detalles del pedido
+    const detallesNormalizados = this.normalizarDetalles(pedido.detalles || pedido.Detalles || pedido.detallePedidos || []);
+    
+    return {
+      id: pedido.id || pedido.Id,
+      numeroPedido: pedido.numeroPedido || pedido.NumeroPedido || pedido.codigo,
+      totalPedido: pedido.totalPedido || pedido.TotalPedido || pedido.total || this.calcularTotalPedido(detallesNormalizados),
+      fechaPedido: pedido.fechaPedido || pedido.FechaPedido,
+      descripcion: pedido.descripcion || pedido.Descripcion || '',
+      proveedorId: pedido.proveedorId || pedido.ProveedorId,
+      estadoPedidoId: pedido.estadoPedidoId || pedido.EstadoPedidoId,
+      detalles: detallesNormalizados,
+      proveedor: this.normalizarProveedor(pedido.proveedor || pedido.Proveedor),
+      estado: this.normalizarEstado(pedido.estado || pedido.Estado || pedido.estadoPedido)
+    };
+  }
+
+  private normalizarDetalles(detalles: any[]): any[] {
+    if (!Array.isArray(detalles)) return [];
+    
+    return detalles.map(detalle => ({
+      id: detalle.id || detalle.Id,
+      productoId: detalle.productoId || detalle.ProductoId,
+      cantidad: detalle.cantidad || detalle.Cantidad || 0,
+      precioUnitario: detalle.precioUnitario || detalle.PrecioUnitario || 
+                     detalle.precioAdquisicion || detalle.PrecioAdquisicion || 0,
+      precioAdquisicion: detalle.precioAdquisicion || detalle.PrecioAdquisicion || 
+                        detalle.precioUnitario || detalle.PrecioUnitario || 0,
+      subtotal: detalle.subtotal || detalle.Subtotal || this.calcularSubtotal(detalle),
+      nombreProducto: detalle.nombreProducto || detalle.NombreProducto || 
+                     (detalle.producto && (detalle.producto.nombre || detalle.producto.Nombre)) ||
+                     (detalle.Producto && (detalle.Producto.nombre || detalle.Producto.Nombre)) || '',
+      producto: this.normalizarProducto(detalle.producto || detalle.Producto)
+    }));
+  }
+
+  private normalizarProducto(producto: any): any {
+    if (!producto) return null;
+    return {
+      id: producto.id || producto.Id,
+      nombre: producto.nombre || producto.Nombre || ''
+    };
+  }
+
+  private calcularSubtotal(detalle: any): number {
+    const cantidad = detalle.cantidad || detalle.Cantidad || 0;
+    const precio = detalle.precioUnitario || detalle.PrecioUnitario || 
+                  detalle.precioAdquisicion || detalle.PrecioAdquisicion || 0;
+    return cantidad * precio;
+  }
+
+  private normalizarProveedor(proveedor: any): any {
+    if (!proveedor) return null;
+    return {
+      id: proveedor.id || proveedor.Id,
+      nombre: proveedor.nombre || proveedor.Nombre || '',
+      nombreContacto: proveedor.nombreContacto || proveedor.NombreContacto || ''
+    };
+  }
+
+  private normalizarEstado(estado: any): any {
+    if (!estado) return null;
+    return {
+      id: estado.id || estado.Id,
+      nombre: estado.nombre || estado.Nombre || ''
+    };
+  }
+
+  private calcularTotalPedido(detalles: any[]): number {
+    return detalles.reduce((total: number, detalle: any) => {
+      return total + (detalle.subtotal || this.calcularSubtotal(detalle));
+    }, 0);
+  }
+
   buscarPedido() {
     if (!this.filtroPedido.trim()) {
       this.pedidos = [...this.originalPedidos];
@@ -78,10 +191,10 @@ export class PedidosComponent implements OnInit {
 
     const filtro = this.filtroPedido.toLowerCase();
     this.pedidos = this.originalPedidos.filter(p =>
-    (p.codigoPedido && p.codigoPedido.toString().toLowerCase().includes(filtro)) ||
-    (p.id && p.id.toString().includes(filtro))
-  );
-
+      (p.numeroPedido && p.numeroPedido.toString().toLowerCase().includes(filtro)) ||
+      (p.id && p.id.toString().includes(filtro))
+    );
+    this.paginaActual = 1;
   }
 
   filtrarPorFecha() {
@@ -96,6 +209,7 @@ export class PedidosComponent implements OnInit {
 
     const inicio = new Date(this.fechaInicio);
     const fin = new Date(this.fechaFin);
+    fin.setHours(23, 59, 59, 999);
 
     if (isNaN(inicio.getTime()) || isNaN(fin.getTime())) {
       Swal.fire({
@@ -106,17 +220,26 @@ export class PedidosComponent implements OnInit {
       return;
     }
 
+    if (inicio > fin) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Rango de fechas inválido',
+        text: 'La fecha de inicio debe ser anterior o igual a la fecha final.'
+      });
+      return;
+    }
+
     this.pedidos = this.originalPedidos.filter(p => {
-      const fecha = new Date(p.fechaPedido);  // Aquí cambia al campo de fecha de pedido
+      const fecha = new Date(p.fechaPedido);
       return fecha >= inicio && fecha <= fin;
     });
+    this.paginaActual = 1;
   }
 
   pedidosPaginados(): any[] {
-    return this.pedidos.slice(
-      (this.paginaActual - 1) * this.elementosPorPagina,
-      this.paginaActual * this.elementosPorPagina
-    );
+    const inicio = (this.paginaActual - 1) * this.elementosPorPagina;
+    const fin = inicio + this.elementosPorPagina;
+    return this.pedidos.slice(inicio, fin);
   }
 
   totalPaginas(): number {
@@ -135,95 +258,79 @@ export class PedidosComponent implements OnInit {
     }
   }
 
+  calcularCantidadTotal(detalles: any[]): number {
+    if (!detalles || detalles.length === 0) return 0;
+    return detalles.reduce((total, detalle) => {
+      return total + (detalle.cantidad || 0);
+    }, 0);
+  }
+
   abrirModalCrear() {
     this.pedidoSeleccionado = {
-      id: 0,
-      codigoPedido: 0,
-      cantidadPedido: 0,
-      totalPedido: 0,
-      fechaPedido: new Date().toISOString(),
-      contacto: '',
-      ProveedorId: '',
-      estado: 'Activo'
+      detalles: [],
+      fechaPedido: new Date().toISOString().split('T')[0]
     };
     this.mostrarModal = true;
     this.modoVista = false;
   }
 
-abrirModalEditar(pedido: any) {
-  this.pedidoSeleccionado = {
-    id: pedido.id || pedido.Id,
-    codigoPedido: pedido.codigoPedido || pedido.CodigoPedido,
-    cantidadPedido: pedido.cantidadPedido || pedido.CantidadPedido,
-    totalPedido: pedido.totalPedido || pedido.TotalPedido,
-    fechaPedido: pedido.fechaPedido || pedido.FechaPedido,
-    proveedorId: pedido.proveedorId || pedido.ProveedorId,
-    estado: pedido.estado ?? pedido.Estado,
-  };
-
-  this.mostrarModal = true;
-  this.modoVista = false;
-}
-
-verPedido(pedido: any) {
-  this.pedidoSeleccionado = {
-    id: pedido.id || pedido.Id,
-    codigoPedido: pedido.codigoPedido || pedido.CodigoPedido,
-    cantidadPedido: pedido.cantidadPedido || pedido.CantidadPedido,
-    totalPedido: pedido.totalPedido || pedido.TotalPedido,
-    fechaPedido: pedido.fechaPedido || pedido.FechaPedido,
-    proveedorId: pedido.proveedorId || pedido.ProveedorId,
-    estado: pedido.estado ?? pedido.Estado,
-  };
-
-  this.modoVista = true;
-  this.mostrarModal = true;
-}
-
-
-  guardarPedido(pedido: any) {
-    // Aquí puedes hacer validaciones si es necesario, por ejemplo evitar duplicados por id o contacto si aplica
-
-    const pedidoParaGuardar = {
-      ...pedido,
-      id: this.pedidoSeleccionado?.id || 0,
-      estadoId: pedido.estadoId ?? true
+  abrirModalEditar(pedido: any) {
+    console.log('Abriendo modal editar con pedido:', pedido);
+    
+    // Crear una copia profunda del pedido normalizado
+    this.pedidoSeleccionado = {
+      id: pedido.id,
+      numeroPedido: pedido.numeroPedido,
+      totalPedido: pedido.totalPedido,
+      fechaPedido: pedido.fechaPedido,
+      descripcion: pedido.descripcion || '',
+      proveedorId: pedido.proveedorId,
+      estadoPedidoId: pedido.estadoPedidoId,
+      detalles: pedido.detalles ? [...pedido.detalles] : [],
+      proveedor: pedido.proveedor,
+      estado: pedido.estado
     };
 
-    console.log('Pedido a enviar:', JSON.stringify(pedidoParaGuardar, null, 2));
+    console.log('Pedido seleccionado para editar:', this.pedidoSeleccionado);
+    
+    this.mostrarModal = true;
+    this.modoVista = false;
+  }
 
-    this.pedidoService.guardarPedido(pedidoParaGuardar).subscribe({
-      next: () => {
-        this.cargarPedidos();
-        this.cerrarModal();
-        Swal.fire({
-          icon: 'success',
-          title: pedidoParaGuardar.id === 0 ? 'Pedido creado' : 'Pedido actualizado',
-          text: 'La operación se ha realizado correctamente.'
-        });
-      },
-      error: (error) => {
-        console.error('Error al guardar pedido:', error);
-        let mensajeError = 'Error al guardar pedido.';
-        if (error.error?.errors) {
-          mensajeError = Object.entries(error.error.errors)
-            .map(([key, val]) => `${key}: ${Array.isArray(val) ? val.join(', ') : val}`)
-            .join('\n');
-        }
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: mensajeError
-        });
-      }
-    });
+  verPedido(pedido: any) {
+    console.log('Abriendo modal ver con pedido:', pedido);
+    
+    // Crear una copia profunda del pedido normalizado
+    this.pedidoSeleccionado = {
+      id: pedido.id,
+      numeroPedido: pedido.numeroPedido,
+      totalPedido: pedido.totalPedido,
+      fechaPedido: pedido.fechaPedido,
+      descripcion: pedido.descripcion || '',
+      proveedorId: pedido.proveedorId,
+      estadoPedidoId: pedido.estadoPedidoId,
+      detalles: pedido.detalles ? [...pedido.detalles] : [],
+      proveedor: pedido.proveedor,
+      estado: pedido.estado,
+      subtotal: pedido.subtotal || 0
+    };
+
+    console.log('Pedido seleccionado para ver:', this.pedidoSeleccionado);
+    
+    this.modoVista = true;
+    this.mostrarModal = true;
+  }
+
+  guardarPedido(pedido: any) {
+    this.cargarPedidos();
+    this.cerrarModal();
   }
 
   eliminarPedidoLogico(id: number) {
     Swal.fire({
       icon: 'warning',
       title: '¿Eliminar pedido?',
-      text: 'Esta acción desactivará el pedido.',
+      text: 'Esta acción Cancelara el pedido.',
       showCancelButton: true,
       confirmButtonText: 'Sí, eliminar',
       cancelButtonText: 'Cancelar'

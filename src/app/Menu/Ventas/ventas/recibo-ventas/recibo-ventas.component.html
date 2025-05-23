@@ -54,8 +54,8 @@
           <tr *ngFor="let producto of data.productos ?? []" class="border-b text-gray-700">
             <td class="py-2">{{ producto.nombreProducto }}</td>
             <td class="text-center py-2">{{ producto.cantidad }}</td>
-            <td class="text-right py-2">{{ producto.precioUnitario | currency }}</td>
-            <td class="text-right py-2">{{ producto.subtotal | currency }}</td>
+            <td class="text-right py-2">{{ producto.precioUnitario | currency:'Q ':'symbol':'1.2-2' }}</td>
+            <td class="text-right py-2">{{ producto.subtotal | currency:'Q ':'symbol':'1.2-2' }}</td>
           </tr>
         </tbody>
       </table>
@@ -66,11 +66,11 @@
       <div class="w-48 space-y-1">
         <div class="flex justify-between">
           <span>Subtotal:</span>
-          <span>{{ data.subtotal | currency }}</span>
+          <span>{{ data.subtotal | currency:'Q ':'symbol':'1.2-2' }}</span>
         </div>
         <div class="flex justify-between font-semibold text-red-600 border-t pt-1">
           <span>TOTAL:</span>
-          <span>{{ data.total | currency }}</span>
+          <span>{{ data.total | currency:'Q ':'symbol':'1.2-2' }}</span>
         </div>
       </div>
     </div>

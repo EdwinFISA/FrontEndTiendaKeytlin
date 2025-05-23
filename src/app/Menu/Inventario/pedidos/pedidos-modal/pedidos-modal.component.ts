@@ -17,10 +17,23 @@ export interface Pedido {
   descripcion?: string;
   proveedorId?: number;
   productosId?: number;
-  estadoId?: number;
-  productos?: any[];
+  estadoPedidoId?: number;
+  detalles?: any[];
   proveedor?: Proveedor;
   estado?: any;
+}
+
+export interface DetallePedido {
+  id?: number;
+  productoId: number;
+  cantidad: number;
+  precioUnitario: number;
+  subtotal?: number;
+  nombreProducto?: string;
+  producto?: {
+    id: number;
+    nombre: string;
+  };
 }
 
 @Component({
@@ -32,7 +45,10 @@ export interface Pedido {
 })
 
 export class PedidosModalComponent implements OnInit {
-  @Input() pedido: Pedido = { productos: [] };
+@Input() pedido: Pedido = { 
+  detalles: [], 
+  estadoPedidoId: 1 // o el valor por defecto que corresponda
+};
   @Input() modoVista: boolean = false;
   @Output() cerrar = new EventEmitter<void>();
   @Output() guardar = new EventEmitter<Pedido>();
@@ -45,6 +61,8 @@ export class PedidosModalComponent implements OnInit {
   fechaFormateada: string = '';
   puedeGuardar: boolean = false;
 
+  
+
 
   constructor(
     private pedidoService: PedidoService,
@@ -53,16 +71,21 @@ export class PedidosModalComponent implements OnInit {
     @Inject(DOCUMENT) private document: Document
   ) {}
 
-  ngOnInit(): void {
-    this.cargarDatos();
-    this.formatearFecha();
+ngOnInit(): void {
+  this.cargarDatos();
+  this.formatearFecha();
 
-    if (!this.pedido.id && !this.pedido.numeroPedido) {
-      this.generarNumeroPedido();
-    }
-
-    this.actualizarEstadoBotonGuardar();
+  if (!this.pedido.id && !this.pedido.numeroPedido) {
+    this.generarNumeroPedido();
   }
+
+  // Inicializar detalles si no existen
+  if (!this.pedido.detalles) {
+    this.pedido.detalles = [];
+  }
+  
+  this.actualizarEstadoBotonGuardar();
+}
 
   generarNumeroPedido(): void {
     const fecha = new Date();
@@ -95,71 +118,103 @@ export class PedidosModalComponent implements OnInit {
       if (!this.pedido.id && estados.length > 0) {
         const estadoPendiente = estados.find(e => e.Nombre?.toLowerCase() === 'pendiente');
         if (estadoPendiente) {
-          this.pedido.estadoId = estadoPendiente.Id;
+          this.pedido.estadoPedidoId = estadoPendiente.Id;
         }
       }
     });
   }
 
-  agregarProductoAlPedido(): void {
+agregarProductoAlPedido(): void {
     if (!this.pedido.productoId || !this.pedido.cantidadPedido || !this.pedido.precioAdquisicion) {
-      Swal.fire('Campos requeridos', 'Completa producto, cantidad y precio antes de agregar.', 'warning');
-      return;
+        Swal.fire('Campos requeridos', 'Completa producto, cantidad y precio antes de agregar.', 'warning');
+        return;
     }
 
-    const productoSeleccionado = this.productos.find(p => p.id === this.pedido.productoId);
-    if (!productoSeleccionado) return;
+    const productoInfo = this.productos.find(p => p.id === this.pedido.productoId);
+    if (!productoInfo) {
+        Swal.fire('Error', 'Producto no encontrado.', 'error');
+        return;
+    }
 
-    const subtotal = this.pedido.cantidadPedido! * this.pedido.precioAdquisicion!;
-    this.pedido.productos = this.pedido.productos || [];
+    const subtotal = this.pedido.cantidadPedido * this.pedido.precioAdquisicion;
+    
+    // Asegurar que detalles existe
+    if (!this.pedido.detalles) {
+        this.pedido.detalles = [];
+    }
 
-    const productoExistenteIndex = this.pedido.productos.findIndex(p => p.productoId === this.pedido.productoId);
+    // Verificar si el producto ya existe en los detalles
+    const productoExistenteIndex = this.pedido.detalles.findIndex(
+        detalle => detalle.productoId === this.pedido.productoId
+    );
+
+    const nuevoDetalle = {
+        productoId: this.pedido.productoId,
+        nombreProducto: productoInfo.nombre,
+        cantidad: this.pedido.cantidadPedido,
+        precioUnitario: this.pedido.precioAdquisicion,
+        precioAdquisicion: this.pedido.precioAdquisicion,
+        subtotal: subtotal,
+        producto: {
+            id: productoInfo.id,
+            nombre: productoInfo.nombre
+        }
+    };
+
     if (productoExistenteIndex >= 0) {
-      this.pedido.productos[productoExistenteIndex] = {
-        productoId: this.pedido.productoId,
-        nombreProducto: productoSeleccionado.nombre,
-        cantidad: this.pedido.cantidadPedido,
-        precioAdquisicion: this.pedido.precioAdquisicion,
-        subtotal: subtotal
-      };
+        // Actualizar producto existente
+        this.pedido.detalles[productoExistenteIndex] = nuevoDetalle;
     } else {
-      this.pedido.productos.push({
-        productoId: this.pedido.productoId,
-        nombreProducto: productoSeleccionado.nombre,
-        cantidad: this.pedido.cantidadPedido,
-        precioAdquisicion: this.pedido.precioAdquisicion,
-        subtotal: subtotal
-      });
+        // Agregar nuevo producto
+        this.pedido.detalles.push(nuevoDetalle);
     }
 
-    // Limpiar inputs
+    console.log('Producto agregado. Detalles actualizados:', this.pedido.detalles);
+
+    // Limpiar campos del pedido
     this.pedido.productoId = undefined;
     this.pedido.cantidadPedido = undefined;
     this.pedido.precioAdquisicion = undefined;
-
+    
+    // Actualizar estado del botón guardar
     this.actualizarEstadoBotonGuardar();
-  }
+}
 
   editarProductoPedido(index: number): void {
-    const producto = this.pedido.productos![index];
+    const producto = this.pedido.detalles![index];
     this.pedido.productoId = producto.productoId;
     this.pedido.cantidadPedido = producto.cantidad;
     this.pedido.precioAdquisicion = producto.precioAdquisicion;
-    this.pedido.productos!.splice(index, 1);
+    this.pedido.detalles!.splice(index, 1);
 
     this.actualizarEstadoBotonGuardar();
   }
 
-  eliminarProductoPedido(index: number): void {
-    this.pedido.productos!.splice(index, 1);
-    this.actualizarEstadoBotonGuardar();
-  }
-
-  async onSubmit(): Promise<void> {
-    if (this.pedidoForm.invalid || (this.pedido.productos?.length ?? 0) === 0) {
-      Swal.fire('Formulario incompleto', 'Agrega al menos un producto al pedido.', 'warning');
-      return;
+eliminarProductoPedido(index: number): void {
+  Swal.fire({
+    title: '¿Eliminar producto?',
+    text: '¿Estás seguro de que quieres eliminar este producto del pedido?',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#070826',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Sí, eliminar',
+    cancelButtonText: 'Cancelar'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      this.pedido.detalles!.splice(index, 1);
+      this.actualizarEstadoBotonGuardar();
+      Swal.fire('Eliminado', 'El producto ha sido eliminado del pedido', 'success');
     }
+  });
+}
+
+async onSubmit(): Promise<void> {
+  // Primero verificar si hay productos agregados
+
+
+    // Luego verificar el resto del formulario
+
 
     if (this.cargando) return;
 
@@ -171,11 +226,11 @@ export class PedidosModalComponent implements OnInit {
     this.cargando = true;
 
     try {
-      this.pedido.totalPedido = this.pedido.productos?.reduce((total, producto) => total + (producto.subtotal || 0), 0) || 0;
+      this.pedido.totalPedido = this.pedido.detalles?.reduce((total, detalles) => total + (detalles.subtotal || 0), 0) || 0;
 
       const pedidoParaGuardar = {
         ...this.pedido,
-        productos: this.pedido.productos?.map(producto => ({
+        productos: this.pedido.detalles?.map(producto => ({
           productoId: producto.productoId,
           cantidad: producto.cantidad,
           precioAdquisicion: producto.precioAdquisicion
@@ -203,7 +258,7 @@ export class PedidosModalComponent implements OnInit {
     const camposRequeridos = [
       { campo: this.pedido.fechaPedido, mensaje: 'La fecha del pedido es requerida' },
       { campo: this.pedido.proveedorId, mensaje: 'El proveedor es requerido' },
-      { campo: this.pedido.estadoId, mensaje: 'El estado del pedido es requerido' }
+      { campo: this.pedido.estadoPedidoId, mensaje: 'El estado del pedido es requerido' }
     ];
 
     for (const { campo, mensaje } of camposRequeridos) {
@@ -219,7 +274,7 @@ export class PedidosModalComponent implements OnInit {
       }
     }
 
-    if (!this.pedido.productos || this.pedido.productos.length === 0) {
+    if (!this.pedido.detalles || this.pedido.detalles.length === 0) {
       await Swal.fire('Error', 'Debe agregar al menos un producto al pedido.', 'error');
       return false;
     }
@@ -232,9 +287,9 @@ export class PedidosModalComponent implements OnInit {
     Object.values(this.pedidoForm.controls).forEach(control => control.markAsTouched());
   }
 
-  private actualizarEstadoBotonGuardar(): void {
-    this.puedeGuardar = !!(this.pedido.productos && this.pedido.productos.length > 0);
-  }
+private actualizarEstadoBotonGuardar(): void {
+  this.puedeGuardar = !!(this.pedido.detalles && this.pedido.detalles.length > 0);
+}
 
   cerrarModal(): void {
     this.cerrar.emit();

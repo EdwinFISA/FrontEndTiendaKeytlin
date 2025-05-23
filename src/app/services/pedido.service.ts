@@ -24,7 +24,7 @@ export class PedidoService {
     }
 
     obtenerEstados(): Observable<any[]> {
-        return this.http.get<any[]>(`${environment.apiUrl}/api/categorias/estados`);
+        return this.http.get<any[]>(`${this.apiUrl}/estados`);
     }
 
     obtenerPedidos(): Observable<any[]> {
@@ -40,13 +40,38 @@ export class PedidoService {
     }
 
     crearPedido(pedido: Pedido): Observable<Pedido> {
-        return this.http.post<Pedido>(this.apiUrl, pedido).pipe(
+        const pedidoDTO = {
+            fechaPedido: pedido.fechaPedido ? new Date(pedido.fechaPedido).toISOString() : null,
+            proveedorId: pedido.proveedorId,
+            estadoPedidoId: pedido.estadoPedidoId,
+            detalles: pedido.detalles?.map((detalle: any) => ({
+                productoId: detalle.productoId,
+                cantidad: detalle.cantidad,
+                precioUnitario: detalle.precioAdquisicion || detalle.precioUnitario
+            }))
+        };
+
+        console.log('➡️ Enviando pedido al backend:', pedidoDTO);
+        return this.http.post<Pedido>(this.apiUrl, pedidoDTO).pipe(
             catchError(this.handleError)
         );
     }
 
+    // MÉTODO ACTUALIZADO para usar el mismo formato que crear
     actualizarPedido(id: number, pedido: Pedido): Observable<Pedido> {
-        return this.http.put<Pedido>(`${this.apiUrl}/${id}`, pedido).pipe(
+        const pedidoDTO = {
+            fechaPedido: pedido.fechaPedido ? new Date(pedido.fechaPedido).toISOString() : null,
+            proveedorId: pedido.proveedorId,
+            estadoPedidoId: pedido.estadoPedidoId,
+            detalles: pedido.detalles?.map((detalle: any) => ({
+                productoId: detalle.productoId,
+                cantidad: detalle.cantidad,
+                precioUnitario: detalle.precioAdquisicion || detalle.precioUnitario
+            }))
+        };
+
+        console.log('➡️ Actualizando pedido al backend:', pedidoDTO);
+        return this.http.put<Pedido>(`${this.apiUrl}/${id}`, pedidoDTO).pipe(
             catchError(this.handleError)
         );
     }
@@ -59,6 +84,7 @@ export class PedidoService {
         }
     }
 
+    // MÉTODO CORREGIDO para eliminación lógica
     eliminarPedidoLogico(id: number): Observable<any> {
         return this.http.put(`${this.apiUrl}/eliminar-logico/${id}`, {}).pipe(
             catchError(this.handleError)

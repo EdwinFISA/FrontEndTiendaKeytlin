@@ -42,6 +42,7 @@ import { HasPermissionDirective } from '../directives/has-permission.directive';
 import { PermisosGuard } from './guards/permisos.guard';
 import { AccessoDenegadoComponent } from './components/acceso-denegado/acceso-denegado.component';
 
+
 export function tokenGetter() {
   return localStorage.getItem('token');
 }
@@ -68,6 +69,7 @@ export function tokenGetter() {
     PermisosModalComponent,
     HasPermissionDirective,
     AccessoDenegadoComponent,
+        DashboardComponent,
   ],
   imports: [
     PedidosModalComponent,
@@ -89,7 +91,8 @@ export function tokenGetter() {
     CategoriaModalComponent,
     HttpClientModule,
     LoginComponent, // Importa LoginComponent como standalone
-    DashboardComponent, // Importa DashboardComponent como standalone
+ // Importa DashboardComponent como standalone
+ 
     JwtModule.forRoot({
       config: {
         tokenGetter: tokenGetter,
